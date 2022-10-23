@@ -10,7 +10,7 @@ class UserController {
 			const user = await User.findOne({ _id: decodedToken.userId });
 			return res.status(200).json({ user });
 		} catch (e) {
-			console.log(e);
+			// console.log(e);
 			return;
 		}
 	}
@@ -35,6 +35,12 @@ class UserController {
 		const token = jwt.sign({ userId: existed._id }, process.env.JWT_SECRET);
 		res.cookie('token', token, { httpOnly: true });
 		res.status(200).json({ user: existed });
+	}
+
+	async upload(req, res) {
+		console.log('file', req.file);
+		console.log('body', req.body);
+		return res.status(200).json({ message: req.file });
 	}
 }
 

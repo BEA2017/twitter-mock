@@ -47,12 +47,12 @@ const Home = () => {
 				<div className="button" onClick={() => setNewTweetModal(true)}>
 					Твитнуть
 				</div>
-				{newTweetModal && (
-					<Modal cancel={() => setNewTweetModal(false)}>
-						<NewTweet />
-					</Modal>
-				)}
 			</div>
+			{newTweetModal && (
+				<Modal cancel={() => setNewTweetModal(false)}>
+					<NewTweet />
+				</Modal>
+			)}
 			<div className="home_content">
 				<Outlet />
 			</div>

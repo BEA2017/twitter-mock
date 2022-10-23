@@ -1,5 +1,5 @@
 import '../App.scss';
-import { BorderOutlined } from '@ant-design/icons';
+import { FileImageOutlined, SmileOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { tweet_add } from '../store/tweetsSlice';
@@ -26,11 +26,8 @@ const NewTweet = ({ input, responseTo, cb }) => {
 				/>
 				<div className="home_new-tweet_controllers">
 					<div className="icons">
-						<BorderOutlined />
-						<BorderOutlined />
-						<BorderOutlined />
-						<BorderOutlined />
-						<BorderOutlined />
+						<SmileOutlined />
+						<FileImageOutlined />
 					</div>
 					<div className="button" onClick={addNewTweet}>
 						Твитнуть

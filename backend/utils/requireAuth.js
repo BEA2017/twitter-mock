@@ -7,7 +7,7 @@ const requireAuth = async (req, res, next) => {
 		req.userId = tokenData.userId;
 		next();
 	} catch (e) {
-		console.log(e);
+		// console.log(e);
 		return;
 	}
 };

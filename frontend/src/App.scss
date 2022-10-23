@@ -28,14 +28,31 @@ ul{
     height: 100vh;
     display: flex;
 
+    .bg{
+        position: absolute;
+        z-index: 0;
+        color: rgb(78, 175, 254);
+        font-size: 50em;
+    }
+
     .login-promo{
         display: flex;
         flex-basis: 50%;
         align-items: center;
+        justify-content: center;
         color: white;
         font-weight: 900;
-        font-size: 1.3em;
-        background: rgb(78, 175, 254);
+        background: rgb(161, 213, 255);
+        overflow: hidden;
+
+        .login-promo_list{
+            z-index: 1;
+
+            .login-promo_list-item{
+                margin-bottom: 1.2em;
+            }
+        }
+
     }
     .login-form{
         display: flex;
@@ -43,30 +60,41 @@ ul{
         flex-direction: column;
         flex-basis: 50%;
         text-align: center;
+        background: white;
+        z-index: 3;
+
+        .login-form_slogan{
+            margin: 0.2em 0;
+        }
         .button{
             padding: 0.3em 1em;
             border-radius: 15px;
             align-self: center;
+            font-size: 1.2em;
+            font-weight: 800;
             cursor: pointer;
         }
         .button:first-of-type{
             background-color: rgb(78, 175, 254);
+            margin-top: 2em;
             color: white;
         }
         .button:nth-of-type(2){
             border: 1px solid rgb(78, 175, 254);
+            margin-top: 1em;
             color: rgb(78, 175, 254);
         }
     }
 }
 
 .modal_shadow{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     width: 100vw;
     background: rgba(33, 33, 33,0.7);
+    z-index: 10;
 
     .modal{
         position: absolute;
@@ -76,8 +104,9 @@ ul{
         background: white;
         padding: 1em 1.3em;
         border-radius: 15px;
-        width: 320px;
-        height: 240px;
+        min-width: 320px;
+        min-height: 240px;
+        z-index: 12;
 
         .modal-header{
             display: flex;
@@ -146,8 +175,8 @@ ul{
     .home_content{
         grid-area: c;
         min-height: 100vh;
-        border-left: 1px solid black;
-        border-right: 1px solid black;
+        border-left: 1px solid rgb(215, 215, 215);
+        border-right: 1px solid rgb(215, 215, 215);
         padding: 0.3em 0.5em;
 
 
@@ -179,6 +208,7 @@ ul{
 
     .button{
         padding: 0.5em 0.8em;
+        margin-left: 5em;
         background: rgb(78, 175, 254);
         color: white;
         font-weight: 800;
@@ -199,6 +229,7 @@ ul{
     .home_new-tweet_controllers{
         display: flex;
         justify-content: space-between;
+        margin: 0 1em;
     }
 }
 
