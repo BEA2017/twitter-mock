@@ -11,16 +11,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import { set_me } from './store/userSlice';
 import Profile from './pages/Profile';
 import Upload from './pages/Upload';
+import Spinner from './components/Spinner';
 
 function App() {
 	const loggedUser = useSelector((state) => state.users.me);
+	const [isInitialized, setIsInitialized] = useState(false);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		axios.get('/me').then((res) => {
-			dispatch(set_me(res.data.user));
-		});
+		axios
+			.get('/me')
+			.then((res) => {
+				console.log('init', res);
+				setIsInitialized(true);
+				dispatch(set_me(res.data.user));
+			})
+			.catch((e) => setIsInitialized(true));
 	}, []);
+
+	if (!isInitialized) return <Spinner />;
 
 	return (
 		<div className="App">

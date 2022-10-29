@@ -10,6 +10,7 @@ import {
 	UserOutlined,
 } from '@ant-design/icons';
 import BackButton from '../components/BackButton';
+import { Avatar } from '../components/Avatar';
 
 const SelectedTweet = () => {
 	const { id } = useParams();
@@ -27,9 +28,10 @@ const SelectedTweet = () => {
 			<div className="selected-tweet_container">
 				<div className="selected-tweet">
 					<div className="selected-tweet_user">
-						<div className="avatar tweet-avatar_default">
+						<Avatar src={`/images/${tweet.user.avatar}`} />
+						{/* <div className="avatar tweet-avatar_default">
 							<UserOutlined />
-						</div>
+						</div> */}
 						<div className="userinfo">
 							<div className="userinfo_username">
 								{tweet.user.name} {tweet.user.surname}

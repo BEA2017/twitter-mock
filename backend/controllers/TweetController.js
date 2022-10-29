@@ -10,7 +10,10 @@ class TweetController {
 	}
 
 	async getTweets(req, res) {
-		const tweets = await Tweet.find({}).populate('user');
+		const id = req.body.id;
+		const tweets = await Tweet.find({ user: { $in: id } })
+			.sort({ createdAt: -1 })
+			.populate('user');
 		const newTweets = await Promise.all(
 			tweets.map(async (t) => {
 				const replies = await Tweet.find({ responseTo: t._id }).populate('user');

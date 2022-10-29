@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-export const tweets_download = createAsyncThunk('tweets/download', async () => {
-	const response = await axios.get('/tweets');
+export const tweets_download = createAsyncThunk('tweets/download', async (subscriptions) => {
+	const response = await axios.post('/tweets', { id: subscriptions });
 	return response.data.tweets;
 });
 
@@ -39,7 +39,7 @@ const tweetsSlice = createSlice({
 				console.log(action.payload);
 			})
 			.addCase(tweet_add.fulfilled, (state, action) => {
-				state.tweets = [...state.tweets, { ...action.payload }];
+				state.tweets = [{ ...action.payload }, ...state.tweets];
 			});
 	},
 });

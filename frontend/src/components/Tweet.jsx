@@ -10,6 +10,8 @@ import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import NewTweet from './NewTweet';
 import { dateFormatter } from '../utils/dateFormatter';
+import { Avatar } from './Avatar';
+import WithNavLink from '../utils/WithNavLink';
 
 const Tweet = ({ tweet }) => {
 	const [showReply, setShowReply] = useState(false);
@@ -22,11 +24,9 @@ const Tweet = ({ tweet }) => {
 	return (
 		<>
 			<div className="tweet_container">
-				<NavLink to={`/${tweet.user.login}`} className={'navlink'}>
-					<div className="avatar tweet-avatar_default">
-						<UserOutlined />
-					</div>
-				</NavLink>
+				<WithNavLink username={`/${tweet.user.login}`}>
+					{tweet.user.avatar ? <Avatar src={`/images/${tweet.user.avatar}`} /> : <Avatar />}
+				</WithNavLink>
 				<div className="tweet_info">
 					<NavLink to={`/${tweet.user.login}`} className={'navlink'}>
 						<span className="tweet_header_name">

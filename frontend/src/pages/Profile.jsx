@@ -3,12 +3,59 @@ import {
 	EnvironmentOutlined,
 	GiftOutlined,
 	GlobalOutlined,
+	UserAddOutlined,
+	UserDeleteOutlined,
 } from '@ant-design/icons';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import BackButton from '../components/BackButton';
+import { Modal } from '../components/Modal';
+import ProfileInfo from './ProfileInfo';
+import { ProfileAvatar } from '../components/Avatar';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { updateFollowList } from '../store/userSlice';
+import Spinner from '../components/Spinner';
+import Tweet from '../components/Tweet';
 
 const Profile = () => {
-	const { profile } = useParams();
+	const login = useParams().profile;
+	const [profile, setProfile] = useState();
+	const [panelItem, setPanelItem] = useState(0);
+	const me = useSelector((state) => state.users.me);
+	const [tweets, setTweets] = useState();
+	const [showModal, setShowModal] = useState(false);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		const getProfileInfo = async () => {
+			const result = await axios.get(`/profile?login=${login}`);
+			return result.data.user;
+		};
+
+		getProfileInfo().then((res) => {
+			setProfile(res);
+			console.log(res);
+		});
+	}, [login, me]);
+
+	useEffect(() => {
+		profile &&
+			axios.post('/tweets', { id: profile._id }).then((res) => {
+				setTweets(res.data.tweets);
+			});
+	}, [profile]);
+
+	const handlePanelItemClick = async (idx) => {
+		setPanelItem(idx);
+		axios.post('/tweets', { id: profile._id }).then((res) => {
+			setTweets(res.data.tweets);
+		});
+	};
+
+	if (!profile) return <Spinner />;
+
 	return (
 		<>
 			<BackButton />
@@ -19,27 +66,55 @@ const Profile = () => {
 						background: 'url("http://www.fillmurray.com/800/500")',
 						backgroundSize: 'cover',
 					}}>
-					<img
-						className="avatar profile_avatar tweet_avatar"
-						src="http://www.fillmurray.com/100/100"
-					/>
+					{profile.avatar ? <ProfileAvatar src={`/images/${profile.avatar}`} /> : <ProfileAvatar />}
 					<div className="cta">
-						<div className="button">Изменить профиль</div>
+						{login === me.login ? (
+							<div className="button" onClick={() => setShowModal((prev) => !prev)}>
+								Изменить профиль
+							</div>
+						) : (
+							<div>
+								{me.subscriptions.includes(profile._id) ? (
+									<div
+										className="button"
+										onClick={() =>
+											dispatch(updateFollowList({ type: 'unfollow', followId: profile._id }))
+										}>
+										<UserDeleteOutlined /> Отписаться
+									</div>
+								) : (
+									<div
+										className="button"
+										onClick={() =>
+											dispatch(updateFollowList({ type: 'follow', followId: profile._id }))
+										}>
+										<UserAddOutlined /> Читать
+									</div>
+								)}
+							</div>
+						)}
 					</div>
 				</div>
+				{showModal && (
+					<Modal cancel={() => setShowModal(false)}>
+						<ProfileInfo cb={() => setShowModal(false)} />
+					</Modal>
+				)}
 				<div className="profile_info">
-					<div className="name">Владимир Путин</div>
-					<div className="login">@putin</div>
-					<div className="about">Президент Российской Федерации</div>
+					<div className="name">
+						{profile.name} {profile.surname}
+					</div>
+					<div className="login">@{profile.login}</div>
+					<div className="about">{profile.about || 'Расскажите о себе'}</div>
 					<div className="personal-info">
 						<div className="personal-info_first-line">
 							<span className="location">
 								<EnvironmentOutlined className="icon-info" />
-								Москва, Россия
+								{profile.city || 'Укажите город'}
 							</span>
 							<span className="webpage">
 								<GlobalOutlined className="icon-info" />
-								kremlin.ru
+								{profile.webpage || 'Укажите сайт'}
 							</span>
 						</div>
 						<div className="personal-info_second-line">
@@ -52,7 +127,31 @@ const Profile = () => {
 								Регистрация: 22 октября 2022г.
 							</span>
 						</div>
+						<div className="personal-info_third-line">
+							<div>
+								<span>{profile.subscriptions.length}</span> в читаемых
+							</div>
+							<span>{profile.subscribers}</span> читателей
+						</div>
 					</div>
+				</div>
+				<ul className="profile_panel">
+					{['Твиты', 'Твиты и ответы', 'Медиа', 'Нравится'].map((i, idx) => {
+						return (
+							<li
+								className={`item ${idx === panelItem ? 'item-active' : ''}`}
+								onClick={() => handlePanelItemClick(idx)}
+								key={idx}>
+								{i}
+							</li>
+						);
+					})}
+				</ul>
+				<div className="profile_tweets">
+					{tweets &&
+						tweets.map((i, idx) => {
+							return <Tweet key={idx} tweet={i} />;
+						})}
 				</div>
 			</div>
 		</>

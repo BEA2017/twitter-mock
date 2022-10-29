@@ -17,7 +17,7 @@ const Register = () => {
 	};
 
 	return (
-		<div className="auth_container">
+		<div className="form_container">
 			<input
 				type={'text'}
 				value={name}

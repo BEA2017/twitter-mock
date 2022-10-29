@@ -8,10 +8,11 @@ import { useSelector, useDispatch } from 'react-redux';
 const TweetsList = () => {
 	const loadingState = useSelector((state) => state.tweets.state);
 	const tweets = useSelector((state) => state.tweets.tweets);
+	const me = useSelector((state) => state.users.me);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		dispatch(tweets_download());
+		dispatch(tweets_download([...me.subscriptions, me._id]));
 	}, []);
 
 	return (
