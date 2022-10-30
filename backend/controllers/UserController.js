@@ -52,12 +52,6 @@ class UserController {
 		res.status(200).json({ user: existed });
 	}
 
-	async upload(req, res) {
-		console.log('file', req.file);
-		console.log('body', req.body);
-		return res.status(200).json({ message: req.file });
-	}
-
 	async updateProfileInfo(req, res) {
 		const data = req.body;
 		await User.updateOne({ _id: req.userId }, { ...data });

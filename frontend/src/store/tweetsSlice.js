@@ -7,7 +7,11 @@ export const tweets_download = createAsyncThunk('tweets/download', async (subscr
 });
 
 export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
-	const response = await axios.post('/tweet', { body: tweet.body, responseTo: tweet.responseTo });
+	const response = await axios.post('/tweet', {
+		body: tweet.body,
+		responseTo: tweet.responseTo,
+		attachment: tweet.attachment,
+	});
 	return { ...response.data.tweet, user: tweet.me };
 });
 

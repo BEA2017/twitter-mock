@@ -7,6 +7,7 @@ const TweetSchema = new mongoose.Schema(
 			ref: 'User',
 		},
 		body: String,
+		attachment: String,
 		responseTo: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Tweet',

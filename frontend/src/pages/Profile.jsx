@@ -63,8 +63,9 @@ const Profile = () => {
 				<div
 					className="profile_hero"
 					style={{
-						background: 'url("http://www.fillmurray.com/800/500")',
-						backgroundSize: 'cover',
+						background:
+							'url("https://pbs.twimg.com/profile_banners/1019169865/1401944529/1500x500")',
+						backgroundSize: 'contain',
 					}}>
 					{profile.avatar ? <ProfileAvatar src={`/images/${profile.avatar}`} /> : <ProfileAvatar />}
 					<div className="cta">
@@ -120,7 +121,7 @@ const Profile = () => {
 						<div className="personal-info_second-line">
 							<span className="birthday">
 								<GiftOutlined className="icon-info" />
-								Дата рождения: 7 октября 1952г.
+								Дата рождения: 18 июня 1942г.
 							</span>
 							<span className="registration-date">
 								<CalendarOutlined className="icon-info" />

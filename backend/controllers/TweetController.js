@@ -4,7 +4,12 @@ class TweetController {
 	async create(req, res) {
 		const data = req.body;
 		console.log(data);
-		const tweet = new Tweet({ body: data.body, user: req.userId, responseTo: data.responseTo });
+		const tweet = new Tweet({
+			body: data.body,
+			user: req.userId,
+			responseTo: data.responseTo,
+			attachment: data.attachment,
+		});
 		await tweet.save();
 		return res.status(201).json({ tweet });
 	}

@@ -39,8 +39,11 @@ const SelectedTweet = () => {
 							<div className="userinfo_login">@{tweet.user.login}</div>
 						</div>
 					</div>
-					<div className="selected-tweet_body">
+					<div className="tweet_body selected-tweet_body">
 						<p>{tweet.body}</p>
+						<div className="tweet_attachments selected-tweet_attachments">
+							{tweet.attachment && <img src={`/images/${tweet.attachment}`} />}
+						</div>
 					</div>
 					<div className="selected-tweet_date">
 						<span>{new Date(tweet.createdAt).toLocaleString()}</span>
@@ -54,7 +57,8 @@ const SelectedTweet = () => {
 				</div>
 			</div>
 			<div className="selected-tweet_replies">
-				{tweet.replies.length > 0 &&
+				{tweet.replies &&
+					tweet.replies.length > 0 &&
 					tweet.replies.map((r, idx) => {
 						return <Tweet key={idx} tweet={r} />;
 					})}

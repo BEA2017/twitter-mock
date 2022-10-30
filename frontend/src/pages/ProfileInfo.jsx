@@ -10,7 +10,7 @@ const ProfileInfo = ({ cb }) => {
 	const me = useSelector((state) => state.users.me);
 	const [name, setName] = useState(me.name || '');
 	const [surname, setSurname] = useState(me.surname || '');
-	const [avatar, setAvatar] = useState(me.avatar || '');
+	const [avatarTmp, setAvatarTmp] = useState('');
 	const [about, setAbout] = useState(me.about || '');
 	const [city, setCity] = useState(me.city || '');
 	const [webpage, setWebpage] = useState(me.webpage || '');
@@ -19,8 +19,14 @@ const ProfileInfo = ({ cb }) => {
 
 	const [file, setFile] = useState('');
 
-	const submitHandler = () => {
-		dispatch(updateProfileInfo({ name, surname, about, city, webpage, avatar }));
+	const submitHandler = async () => {
+		axios
+			.post('/save', { file: avatarTmp })
+			.then((res) =>
+				avatarTmp
+					? dispatch(updateProfileInfo({ name, surname, about, city, webpage, avatar: avatarTmp }))
+					: dispatch(updateProfileInfo({ name, surname, about, city, webpage })),
+			);
 		cb();
 	};
 
@@ -29,7 +35,7 @@ const ProfileInfo = ({ cb }) => {
 	useEffect(() => {
 		if (file !== '') {
 			const bodyFormData = new FormData();
-			bodyFormData.append('avatar', file);
+			bodyFormData.append('image', file);
 			axios({
 				method: 'post',
 				url: '/upload',
@@ -37,7 +43,7 @@ const ProfileInfo = ({ cb }) => {
 				headers: { 'Content-Type': 'multipart/form-data' },
 			})
 				.then(function (response) {
-					setAvatar(response.data.message.filename);
+					setAvatarTmp(response.data.message.filename);
 					console.log('success', response);
 				})
 				.catch(function (response) {
@@ -54,11 +60,17 @@ const ProfileInfo = ({ cb }) => {
 		<div className="profile_container form_container">
 			<div className="avatar_container">
 				<div onClick={uploadAvatar}>
-					{avatar ? <Avatar src={`/images/${avatar}`} /> : <Avatar />}
+					{avatarTmp ? (
+						<Avatar src={`/images/tmp/${avatarTmp}`} />
+					) : me.avatar ? (
+						<Avatar src={`/images/${me.avatar}`} />
+					) : (
+						<Avatar />
+					)}
 				</div>
 				<input
 					type={'file'}
-					name={'avatar'}
+					name={'image'}
 					onChange={(e) => setFile(e.target.files[0])}
 					ref={avatar_input}
 					style={{ display: 'none' }}

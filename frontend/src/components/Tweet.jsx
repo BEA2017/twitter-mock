@@ -39,7 +39,12 @@ const Tweet = ({ tweet }) => {
 							{' '}
 							&#183; {dateFormatter(new Date(tweet.createdAt))}
 						</span>
-						<div className="tweet_body">{tweet.body}</div>
+						<div className="tweet_body">
+							{tweet.body}
+							<div className="tweet_attachments">
+								{tweet.attachment && <img src={`/images/${tweet.attachment}`} />}
+							</div>
+						</div>
 						<div className="tweet_controllers">
 							<div className="controller">
 								<MessageOutlined className="icon" onClick={onClickTweetController} />{' '}

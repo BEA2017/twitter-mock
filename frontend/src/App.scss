@@ -8,7 +8,7 @@ ul{
     list-style-type: none;
 }
 
-textarea, input[type="text"]{
+textarea, input[type="text"],input[type="password"]{
     background: rgb(236, 236, 236);
 }
 
@@ -240,12 +240,36 @@ textarea, input[type="text"]{
         display: flex;
         justify-content: space-between;
         margin: 0 1em;
+
+        .icons{
+            display: flex;
+        }
+    }
+
+    .attachments{
+        .attachments_item{
+            max-width: 150px;
+            max-height: 150px;
+            overflow: hidden;
+            img{
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
+            }
+        }
     }
 }
 
 .avatar{
+    overflow: hidden;
     width: 100px;
-    height: 100px; 
+    height: 100px;
+
+    img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 }
 
 .profile_avatar{
@@ -384,6 +408,29 @@ textarea, input[type="text"]{
     }
 }
 
+.tweet_body{
+
+    .tweet_attachments{
+        max-width: 350px;
+        max-height: 350px;
+        overflow: hidden;
+
+        img{
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.selected-tweet_body{
+
+    .selected-tweet_attachments{
+        max-width: 500px;
+        max-height: 500px;
+    }
+}
+
 .tweet_container{
     display: flex;
     padding: 0.25em 0.8em;
@@ -392,6 +439,7 @@ textarea, input[type="text"]{
     .navlink{
         text-decoration: none;
         color: black;
+
     }
     
     .tweet_info{
