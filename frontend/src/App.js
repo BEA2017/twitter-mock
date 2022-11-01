@@ -12,6 +12,7 @@ import { set_me } from './store/userSlice';
 import Profile from './pages/Profile';
 import Upload from './pages/Upload';
 import Spinner from './components/Spinner';
+import SearchPage from './pages/SearchPage';
 
 function App() {
 	const loggedUser = useSelector((state) => state.users.me);
@@ -39,6 +40,7 @@ function App() {
 						<Route path="/" element={<Home />}>
 							<Route index element={<TweetsList />} />
 							<Route path={'tweets/:id'} element={<SelectedTweet />} />
+							<Route path={'/search'} element={<SearchPage />} />
 							<Route path={'/:profile'} element={<Profile />} />
 						</Route>
 						{['/login', '*'].map((path, idx) => (

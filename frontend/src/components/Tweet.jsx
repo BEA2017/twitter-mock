@@ -13,7 +13,30 @@ import { dateFormatter } from '../utils/dateFormatter';
 import { Avatar } from './Avatar';
 import WithNavLink from '../utils/WithNavLink';
 
-const Tweet = ({ tweet }) => {
+const bodyFormatter = (body, query) => {
+	const matchIndexes = [];
+	let pos = -1;
+	do {
+		pos = body.toLowerCase().indexOf(query.toLowerCase(), pos + 1);
+		pos !== -1 && matchIndexes.push(pos);
+	} while (pos !== -1);
+
+	let formattedTweetBody = [];
+	let prev = 0;
+	matchIndexes.forEach((i) => {
+		formattedTweetBody.push(body.slice(prev, i));
+		formattedTweetBody.push(
+			<span className="body_query-result">{body.slice(i, i + query.length)}</span>,
+		);
+		prev = i + query.length;
+	});
+	if (matchIndexes.at(-1) + query.length < body.length) {
+		formattedTweetBody.push(body.slice(matchIndexes.at(-1) + query.length, body.length));
+	}
+	return formattedTweetBody;
+};
+
+const Tweet = ({ tweet, query }) => {
 	const [showReply, setShowReply] = useState(false);
 
 	const onClickTweetController = (e) => {
@@ -40,7 +63,7 @@ const Tweet = ({ tweet }) => {
 							&#183; {dateFormatter(new Date(tweet.createdAt))}
 						</span>
 						<div className="tweet_body">
-							{tweet.body}
+							{query ? bodyFormatter(tweet.body, query) : tweet.body}
 							<div className="tweet_attachments">
 								{tweet.attachment && <img src={`/images/${tweet.attachment}`} />}
 							</div>

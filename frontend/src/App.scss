@@ -34,6 +34,11 @@ textarea, input[type="text"],input[type="password"]{
     cursor: pointer;
 }
 
+.body_query-result{
+    color: white;
+    background: rgb(78, 175, 254);
+}
+
 .login_page-container{
     height: 100vh;
     display: flex;
@@ -199,12 +204,20 @@ textarea, input[type="text"],input[type="password"]{
 
         .right-sidebar_header{
             height: 48px;
+            position: relative;
+
             .right-sidebar_search{
                 margin: 0.8em;
-                padding: 0.5em 0.8em;
+                padding: 0.5em 2.9em 0.5em 0.8em;
                 height: 35px;
                 min-width: 90%;
                 border-radius: 30px;
+            }
+            .right-sidebar_search-icon{
+                position: absolute;
+                top: 50%;
+                transform: translate(-48px,-30%);
+                cursor: pointer;
             }
         }
 

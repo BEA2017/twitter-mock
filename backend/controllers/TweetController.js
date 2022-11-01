@@ -28,6 +28,15 @@ class TweetController {
 		);
 		return res.status(200).json({ tweets: newTweets });
 	}
+
+	async searchTweets(req, res) {
+		const searchQuery = req.body.query;
+		console.log('searchQuery', searchQuery);
+		const result = await Tweet.find({ body: { $regex: searchQuery, $options: 'i' } }).populate(
+			'user',
+		);
+		res.status(200).json({ result });
+	}
 }
 
 module.exports = new TweetController();

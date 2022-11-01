@@ -22,4 +22,6 @@ router.post('/save', FileController.savePersistent);
 router.post('/tweet', requireAuth, TweetController.create);
 router.post('/tweets', requireAuth, TweetController.getTweets);
 
+router.post('/search', TweetController.searchTweets);
+
 module.exports = router;

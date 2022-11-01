@@ -16,7 +16,13 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 const Home = () => {
 	const [newTweetModal, setNewTweetModal] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
 	const navigate = useNavigate();
+
+	const handleSearch = () => {
+		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+		// navigate(`/search?q=${searchQuery}`);
+	};
 
 	return (
 		<div className="home_container">
@@ -62,7 +68,10 @@ const Home = () => {
 						type={'text'}
 						className={'right-sidebar_search'}
 						placeholder={'Поиск по твиттеру'}
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
+					<SearchOutlined onClick={handleSearch} className="right-sidebar_search-icon" />
 				</div>
 			</div>
 		</div>
