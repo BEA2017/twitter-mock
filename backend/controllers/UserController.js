@@ -8,7 +8,7 @@ class UserController {
 		if (!token) return res.status(302).send();
 		try {
 			const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
-			const user = await User.findOne({ _id: decodedToken.userId });
+			const user = await User.findOne({ _id: decodedToken.userId }).populate('subscriptions');
 			return res.status(200).json({ user });
 		} catch (e) {
 			return res.status(400).send();

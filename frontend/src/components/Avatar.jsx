@@ -12,6 +12,18 @@ export const Avatar = ({ src, onClick }) => {
 	);
 };
 
+export const AvatarSmall = ({ src, onClick }) => {
+	return src ? (
+		<div className="avatar-sm tweet_avatar">
+			<img onClick={onClick} src={src} />
+		</div>
+	) : (
+		<div className={`avatar-sm tweet-avatar_default`}>
+			<UserOutlined />
+		</div>
+	);
+};
+
 export const ProfileAvatar = ({ src, onClick }) => {
 	return (
 		<>

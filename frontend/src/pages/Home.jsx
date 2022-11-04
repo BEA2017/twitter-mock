@@ -1,18 +1,12 @@
-import {
-	BookOutlined,
-	BorderOutlined,
-	BulbOutlined,
-	FileTextOutlined,
-	MessageOutlined,
-	SearchOutlined,
-	TwitterOutlined,
-	UserOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined, TwitterOutlined } from '@ant-design/icons';
 import '../App.scss';
 import NewTweet from '../components/NewTweet';
 import { Modal } from '../components/Modal';
 import { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Navbar from '../components/Navbar';
+import Logo from '../components/Logo';
 
 const Home = () => {
 	const [newTweetModal, setNewTweetModal] = useState(false);
@@ -26,30 +20,9 @@ const Home = () => {
 
 	return (
 		<div className="home_container">
-			<div className="home_left-sidebar">
-				<div className="logo icon" onClick={() => navigate('/')}>
-					<TwitterOutlined />
-				</div>
-				<ul>
-					<li>
-						<SearchOutlined /> Поиск
-					</li>
-					<li>
-						<BulbOutlined /> Уведомления
-					</li>
-					<li>
-						<MessageOutlined /> Сообщения
-					</li>
-					<li>
-						<BookOutlined /> Закладки
-					</li>
-					<li>
-						<FileTextOutlined /> Список
-					</li>
-					<li>
-						<UserOutlined /> Профиль
-					</li>
-				</ul>
+			<div className="left_sidebar home_left-sidebar">
+				<Logo />
+				<Navbar />
 				<div className="button" onClick={() => setNewTweetModal(true)}>
 					Твитнуть
 				</div>

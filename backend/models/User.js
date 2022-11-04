@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
 	password: String,
 	confirmHash: String,
 	confirmed: Boolean,
-	subscriptions: { type: [mongoose.Types.ObjectId], ref: 'User', default: [] },
+	subscriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 module.exports = new mongoose.model('User', UserSchema);

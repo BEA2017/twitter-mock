@@ -75,7 +75,7 @@ const Profile = () => {
 							</div>
 						) : (
 							<div>
-								{me.subscriptions.includes(profile._id) ? (
+								{me.subscriptions.find((sub) => sub._id === profile._id) ? (
 									<div
 										className="button"
 										onClick={() =>

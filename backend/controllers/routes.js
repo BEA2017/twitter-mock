@@ -4,6 +4,7 @@ const upload = require('../utils/uploadFiles');
 const TweetController = require('./TweetController');
 const UserController = require('./UserController');
 const FileController = require('./FileController');
+const MessageController = require('./MessageController');
 
 const router = require('express').Router();
 
@@ -13,6 +14,8 @@ router.post('/login', UserController.login);
 
 router.post('/profile', requireAuth, UserController.updateProfileInfo);
 router.get('/profile', UserController.getProfileInfo);
+
+router.post('/tread', requireAuth, MessageController.createThread);
 
 router.post('/follow', requireAuth, UserController.followUser);
 
