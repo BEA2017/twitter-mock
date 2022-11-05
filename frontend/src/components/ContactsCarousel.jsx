@@ -1,6 +1,7 @@
 import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { AvatarSmall } from './Avatar';
 
 const ContactsCarousel = ({ contacts }) => {
@@ -43,16 +44,12 @@ const ContactsCarousel = ({ contacts }) => {
 				style={{ transform: `translateX(-${offset}px)` }}>
 				{contacts.map((c, idx) => {
 					return (
-						<>
-							<div className="carousel-item">
+						<div className="carousel-item" key={idx}>
+							<NavLink className="navlink" to={`/im?sel=${c.login}`}>
 								<AvatarSmall src={`/images/${c.avatar}`} />
 								<div>{c.name}</div>
-							</div>
-							<div className="carousel-item">
-								<AvatarSmall src={`/images/${c.avatar}`} />
-								<div>{c.name}</div>
-							</div>
-						</>
+							</NavLink>
+						</div>
 					);
 				})}
 			</div>

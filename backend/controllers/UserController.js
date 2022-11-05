@@ -22,7 +22,6 @@ class UserController {
 				{ login: data.login },
 				'_id name surname login about avatar city webpage subscriptions',
 			);
-			console.log('result', user);
 			const subscribers = await User.count({ subscriptions: { $in: user._id } });
 			return res.status(200).json({ user: { ...user._doc, subscribers } });
 		} catch (e) {

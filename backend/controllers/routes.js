@@ -15,7 +15,10 @@ router.post('/login', UserController.login);
 router.post('/profile', requireAuth, UserController.updateProfileInfo);
 router.get('/profile', UserController.getProfileInfo);
 
-router.post('/tread', requireAuth, MessageController.createThread);
+router.post('/thread', requireAuth, MessageController.requestThread.bind(MessageController));
+
+router.post('/message', requireAuth, MessageController.createMessage);
+router.get('/messages', requireAuth, MessageController.getMessages);
 
 router.post('/follow', requireAuth, UserController.followUser);
 

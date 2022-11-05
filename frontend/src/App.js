@@ -45,6 +45,7 @@ function App() {
 							<Route path={'/:profile'} element={<Profile />} />
 						</Route>
 						<Route path={'/im'} element={<Messenger />} />
+						<Route path={'/im?sel=:login'} element={<Messenger />} />
 						{['/login', '*'].map((path, idx) => (
 							<Route key={idx} path={path} element={<Navigate replace to={'/'} />} />
 						))}

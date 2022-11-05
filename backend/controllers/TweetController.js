@@ -3,7 +3,6 @@ const Tweet = require('../models/Tweet');
 class TweetController {
 	async create(req, res) {
 		const data = req.body;
-		console.log(data);
 		const tweet = new Tweet({
 			body: data.body,
 			user: req.userId,
@@ -31,7 +30,6 @@ class TweetController {
 
 	async searchTweets(req, res) {
 		const searchQuery = req.body.query;
-		console.log('searchQuery', searchQuery);
 		const result = await Tweet.find({ body: { $regex: searchQuery, $options: 'i' } }).populate(
 			'user',
 		);
