@@ -15,7 +15,6 @@ const Home = () => {
 
 	const handleSearch = () => {
 		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-		// navigate(`/search?q=${searchQuery}`);
 	};
 
 	return (

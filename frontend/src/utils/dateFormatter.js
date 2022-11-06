@@ -10,3 +10,8 @@ export const dateFormatter = (date) => {
 	if (diff < oneDay) return new Date(date).toLocaleTimeString();
 	return new Date(date).toLocaleDateString();
 };
+
+export const messengerTimeFormatter = (date) => {
+	const time = new Date(date).toTimeString().split(':');
+	return `${time[0]}:${time[1]}`;
+};

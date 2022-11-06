@@ -16,6 +16,7 @@ router.post('/profile', requireAuth, UserController.updateProfileInfo);
 router.get('/profile', UserController.getProfileInfo);
 
 router.post('/thread', requireAuth, MessageController.requestThread.bind(MessageController));
+router.get('/thread', requireAuth, MessageController.requestThreadMessages.bind(MessageController));
 
 router.post('/message', requireAuth, MessageController.createMessage);
 router.get('/messages', requireAuth, MessageController.getMessages);

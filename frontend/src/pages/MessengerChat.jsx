@@ -10,6 +10,8 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Avatar } from '../components/Avatar';
+import Message from '../components/Message';
+import MessengerChatBody from './MessengerChatBody';
 
 const MessengerChat = ({ sel, th }) => {
 	const [companion, setCompanion] = useState();
@@ -27,7 +29,7 @@ const MessengerChat = ({ sel, th }) => {
 	useEffect(() => {
 		const loadMessages = async () => {
 			const thread = await axios
-				.post(`/thread`, { request: 'get', participants: [me.login, sel] })
+				.post(`/thread`, { request: 'getByLogins', participants: [me.login, sel] })
 				.then((res) => res.data.thread);
 			console.log('thread', thread);
 			thread &&
@@ -53,11 +55,7 @@ const MessengerChat = ({ sel, th }) => {
 						<span>{`${companion.name} ${companion.surname}`}</span>
 					</div>
 					{messages.length ? (
-						messages.map((m, idx) => (
-							<div key={idx} className="chat_message">
-								{m.body}
-							</div>
-						))
+						<MessengerChatBody messages={messages} />
 					) : (
 						<ChatEmpty companion={companion} />
 					)}

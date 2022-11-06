@@ -236,6 +236,48 @@ textarea, input[type="text"],input[type="password"]{
                 }
                 
             }
+
+            .messenger_threads{
+                margin-top: 1em;
+
+                .thread-item_container{
+                    display: flex;
+                    padding-right: 0.5em;
+
+                    .thread-item_avatar{
+                        flex-basis: 69.8px;
+                        div{
+                            margin: 0 auto;
+                            margin: 0.4em;
+                        }
+                    }
+
+                    .thread-item_body{
+                        width: calc(100% - 69.8px);
+                        padding: 0.4em 0;
+                        border-bottom: 1px solid rgb(215, 215, 215);
+
+                        .message{
+                            span{
+                                color: rgb(194, 194, 194);
+                            }
+                        }
+
+                        .info{
+                            display: flex;
+
+                           .date{
+                            margin-left: auto;
+                           } 
+                        }
+                    }
+
+                }
+
+                .thread-item_container:hover{
+                    background: rgb(205, 240, 255);
+                }
+            }
         }
 
         .messenger_chat{
@@ -243,6 +285,17 @@ textarea, input[type="text"],input[type="password"]{
             flex-direction: column;
             justify-content: center;
             align-items: center;
+
+            .chat_message{
+                display: flex;
+                margin: 1em 2.5em;
+
+                .chat_message-body{
+                    display: flex;
+                    flex-direction: column;
+                    margin-left: 0.5em;
+                }
+            }
 
             .chat_header{
                 position: sticky;
@@ -252,6 +305,18 @@ textarea, input[type="text"],input[type="password"]{
                 padding: calc((44.3px - 1em) / 2);
                 text-align: center;
                 border-bottom: 1px solid rgb(215, 215, 215);
+            }
+
+            .chat_body{
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                height: 100%;
+                width: 100%;
+
+                .chat_body-date{
+                    text-align: center;
+                }
             }
 
             .chat_input{
