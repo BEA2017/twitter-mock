@@ -4,6 +4,7 @@ import Tweet from '../components/Tweet';
 import { useEffect } from 'react';
 import { tweets_download } from '../store/tweetsSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { socket } from '../store/sockets';
 
 const TweetsList = () => {
 	const loadingState = useSelector((state) => state.tweets.state);
@@ -14,6 +15,11 @@ const TweetsList = () => {
 	useEffect(() => {
 		dispatch(tweets_download([...me.subscriptions, me._id]));
 	}, []);
+
+	socket &&
+		socket.on('new tweet', () => {
+			dispatch(tweets_download([...me.subscriptions, me._id]));
+		});
 
 	return (
 		<>

@@ -10,10 +10,10 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { set_me } from './store/userSlice';
 import Profile from './pages/Profile';
-import Upload from './pages/Upload';
 import Spinner from './components/Spinner';
 import SearchPage from './pages/SearchPage';
 import Messenger from './pages/Messenger';
+import { connectSocket } from './store/sockets';
 
 function App() {
 	const loggedUser = useSelector((state) => state.users.me);
@@ -26,6 +26,7 @@ function App() {
 			.then((res) => {
 				console.log('init', res);
 				setIsInitialized(true);
+				connectSocket(res.data.user);
 				dispatch(set_me(res.data.user));
 			})
 			.catch((e) => setIsInitialized(true));
@@ -53,7 +54,6 @@ function App() {
 				) : (
 					<Routes>
 						<Route path="/login" element={<StartingPage />} />
-						<Route path="/upload" element={<Upload />} />
 						<Route path="*" element={<Navigate replace to={'/login'} />} />
 					</Routes>
 				)}

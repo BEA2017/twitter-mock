@@ -7,6 +7,7 @@ import Profile from '../pages/Profile';
 import { Avatar } from './Avatar';
 import { createRef } from 'react';
 import axios from 'axios';
+import { socket } from '../App';
 
 const NewTweet = ({ input, responseTo, cb }) => {
 	const [tweetBody, setTweetBody] = useState(input);

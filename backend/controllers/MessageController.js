@@ -45,6 +45,7 @@ class MessageController {
 	}
 
 	async queryThreadByLogins(logins, req) {
+		console.log('MessageController/queryThreadByLogins:logins', logins);
 		let participantsId = await Promise.all(
 			logins.map(async (login) => {
 				const user = await User.findOne({ login });

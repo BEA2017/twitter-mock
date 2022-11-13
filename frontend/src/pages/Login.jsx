@@ -5,6 +5,7 @@ import '../App.scss';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { set_me } from '../store/userSlice';
+import { connectSocket } from '../store/sockets';
 
 const Login = () => {
 	const [login, setLogin] = useState('');
@@ -15,6 +16,7 @@ const Login = () => {
 	const submitHandler = () => {
 		axios.post('/login', { login, password }).then((res) => {
 			navigate('/');
+			connectSocket(res.data.user);
 			dispatch(set_me(res.data.user));
 		});
 	};

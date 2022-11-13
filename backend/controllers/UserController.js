@@ -42,7 +42,7 @@ class UserController {
 
 	async login(req, res) {
 		const data = req.body;
-		const existed = await User.findOne({ login: data.login });
+		const existed = await User.findOne({ login: data.login }).populate('subscriptions');
 		if (!existed) return res.status(400).json({ message: 'Incorrect credentials' });
 		const validationSuccess = await bcrypt.compareSync(data.password, existed.password);
 		if (!validationSuccess) return res.status(400).json({ message: 'Incorrect credentials' });

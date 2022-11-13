@@ -22,25 +22,25 @@ const Messenger = () => {
 	}, []);
 
 	useEffect(() => {
-		const getUserThreads = async () => {
-			const threadData = [];
-			const threadInfo = await axios
-				.post('/thread', { request: 'getByLogin', login: me.login })
-				.then((res) => res.data.threads.map((obj) => obj));
-			// console.log('Messenger/getUserThreads', threadInfo);
-			await Promise.all(
-				threadInfo.map(async (t) => {
-					let companion = t.participants.find((p) => p.login !== me.login);
-					return await axios
-						.get(`/thread?threadId=${t._id}`)
-						.then((res) => threadData.push({ companion, messages: res.data.messages }));
-				}),
-			);
-			console.log('Messenger/getUserThreads', threadData);
-			setThreads(threadData);
-		};
 		getUserThreads();
 	}, []);
+
+	const getUserThreads = async () => {
+		const threadData = [];
+		const threadInfo = await axios
+			.post('/thread', { request: 'getByLogin', login: me.login })
+			.then((res) => res.data.threads.map((obj) => obj));
+		await Promise.all(
+			threadInfo.map(async (t) => {
+				let companion = t.participants.find((p) => p.login !== me.login);
+				return await axios
+					.get(`/thread?threadId=${t._id}`)
+					.then((res) => threadData.push({ companion, messages: res.data.messages }));
+			}),
+		);
+		console.log('Messenger/getUserThreads', threadData);
+		setThreads(threadData);
+	};
 
 	return (
 		<div className="messenger_container">
@@ -65,7 +65,7 @@ const Messenger = () => {
 						})}
 					</div>
 				</div>
-				<MessengerChat sel={searchParams.get('sel')} />
+				<MessengerChat sel={searchParams.get('sel')} cb={getUserThreads} />
 			</div>
 		</div>
 	);

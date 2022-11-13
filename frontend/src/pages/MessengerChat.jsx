@@ -9,35 +9,45 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 import { Avatar } from '../components/Avatar';
 import Message from '../components/Message';
+import Spinner from '../components/Spinner';
+import { socket } from '../store/sockets';
 import MessengerChatBody from './MessengerChatBody';
 
-const MessengerChat = ({ sel, th }) => {
+const MessengerChat = ({ sel, cb }) => {
 	const [companion, setCompanion] = useState();
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState([]);
+	const [isLoaded, setIsLoaded] = useState(false);
 	const me = useSelector((state) => state.users.me);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		setMessages([]);
+		setIsLoaded(false);
 		sel
 			? axios.get(`/profile?login=${sel}`).then((res) => setCompanion(res.data.user))
 			: setCompanion();
 	}, [sel]);
 
 	useEffect(() => {
-		const loadMessages = async () => {
-			const thread = await axios
-				.post(`/thread`, { request: 'getByLogins', participants: [me.login, sel] })
-				.then((res) => res.data.thread);
-			console.log('thread', thread);
-			thread &&
-				axios.get(`/messages?thread=${thread._id}`).then((res) => setMessages(res.data.messages));
-		};
-
 		sel && loadMessages();
 	}, [companion]);
+
+	const loadMessages = async () => {
+		const thread = await axios
+			.post(`/thread`, { request: 'getByLogins', participants: [me.login, sel] })
+			.then((res) => res.data.thread);
+		console.log('thread', thread);
+		thread
+			? axios.get(`/messages?thread=${thread._id}`).then((res) => {
+					setMessages(res.data.messages);
+					setIsLoaded(true);
+			  })
+			: setIsLoaded(true);
+	};
 
 	const submitMessage = async () => {
 		const thread = await axios.post('/thread', {
@@ -45,7 +55,14 @@ const MessengerChat = ({ sel, th }) => {
 			participants: [me.login, sel],
 		});
 		await axios.post('/message', { author: me._id, thread: thread.data.thread._id, body: message });
+		socket.emit('new message', companion._id);
+		await loadMessages();
+		await cb();
 	};
+
+	socket.on('new message', () => {
+		navigate(0);
+	});
 
 	return (
 		<div className="messenger_chat">
@@ -54,11 +71,14 @@ const MessengerChat = ({ sel, th }) => {
 					<div className="chat_header">
 						<span>{`${companion.name} ${companion.surname}`}</span>
 					</div>
-					{messages.length ? (
+					{!isLoaded ? (
+						<Spinner />
+					) : messages.length ? (
 						<MessengerChatBody messages={messages} />
 					) : (
 						<ChatEmpty companion={companion} />
 					)}
+
 					<div className="chat_input">
 						<PaperClipOutlined className="icon" />
 						<div className="input_container">

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { socket } from './sockets';
 
 export const tweets_download = createAsyncThunk('tweets/download', async (subscriptions) => {
 	const response = await axios.post('/tweets', { id: subscriptions });
@@ -12,6 +13,7 @@ export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
 		responseTo: tweet.responseTo,
 		attachment: tweet.attachment,
 	});
+	socket.emit('new tweet', tweet.me._id);
 	return { ...response.data.tweet, user: tweet.me };
 });
 

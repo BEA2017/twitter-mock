@@ -10,11 +10,12 @@ class FileController {
 
 	async savePersistent(req, res) {
 		const file = req.body.file;
-		fs.rename(
-			path.join(__dirname, '..', 'public', 'images', 'tmp', file),
-			path.join(__dirname, '..', 'public', 'images', file),
-			(e) => console.log('completed', e),
-		);
+		file &&
+			fs.rename(
+				path.join(__dirname, '..', 'public', 'images', 'tmp', file),
+				path.join(__dirname, '..', 'public', 'images', file),
+				(e) => console.log('completed', e),
+			);
 		return res.status(200).send();
 	}
 }
