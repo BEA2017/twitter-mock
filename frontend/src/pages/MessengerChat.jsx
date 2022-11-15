@@ -43,11 +43,17 @@ const MessengerChat = ({ sel, cb }) => {
 		console.log('thread', thread);
 		thread
 			? axios.get(`/messages?thread=${thread._id}`).then((res) => {
-					setMessages(res.data.messages);
+					setMessages(
+						res.data.messages.sort((a, b) =>
+							new Date(a.createdAt) >= new Date(b.createdAt) ? 1 : -1,
+						),
+					);
 					setIsLoaded(true);
 			  })
 			: setIsLoaded(true);
 	};
+
+	console.log('MessengerChat/sorting messages', messages);
 
 	const submitMessage = async () => {
 		const thread = await axios.post('/thread', {
@@ -72,7 +78,9 @@ const MessengerChat = ({ sel, cb }) => {
 						<span>{`${companion.name} ${companion.surname}`}</span>
 					</div>
 					{!isLoaded ? (
-						<Spinner />
+						<div className="chat_body-empty">
+							<Spinner />
+						</div>
 					) : messages.length ? (
 						<MessengerChatBody messages={messages} />
 					) : (
@@ -95,10 +103,10 @@ const MessengerChat = ({ sel, cb }) => {
 					</div>
 				</>
 			) : (
-				<>
+				<div className="chat_body-empty">
 					<CommentOutlined style={{ fontSize: '2em' }} />
 					<p>Выберите чат или создайте новый</p>
-				</>
+				</div>
 			)}
 		</div>
 	);
@@ -108,10 +116,10 @@ export default MessengerChat;
 
 const ChatEmpty = ({ companion }) => {
 	return (
-		<>
+		<div className="chat_body-empty">
 			<Avatar src={`/images/${companion.avatar}`} />
 			<h3>{`${companion.name} ${companion.surname}`}</h3>
 			<span>История переписки не найдена</span>
-		</>
+		</div>
 	);
 };
