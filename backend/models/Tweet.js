@@ -7,8 +7,28 @@ const TweetSchema = new mongoose.Schema(
 			ref: 'User',
 		},
 		body: String,
+		retweetBody: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Tweet',
+		},
 		attachment: String,
-		responseTo: {
+		type: {
+			type: String,
+			enum: ['Tweet', 'Retweet', 'Response'],
+		},
+		retweettedBy: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'User',
+			},
+		],
+		likedBy: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'User',
+			},
+		],
+		parentTweet: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Tweet',
 		},

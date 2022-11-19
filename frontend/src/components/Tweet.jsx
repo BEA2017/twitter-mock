@@ -12,6 +12,10 @@ import NewTweet from './NewTweet';
 import { dateFormatter } from '../utils/dateFormatter';
 import { Avatar } from './Avatar';
 import WithNavLink from '../utils/WithNavLink';
+import { useDispatch, useSelector } from 'react-redux';
+import { tweets_update, tweet_add } from '../store/tweetsSlice';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const bodyFormatter = (body, query) => {
 	const matchIndexes = [];
@@ -36,12 +40,42 @@ const bodyFormatter = (body, query) => {
 	return formattedTweetBody;
 };
 
+export const Retweet = ({ tweet }) => {
+	const me = useSelector((state) => state.users.me);
+	const [isMe, setIsMe] = useState(me._id === tweet.user._id);
+
+	return (
+		<div className="retweet_container">
+			<div className="retweet_header-wrapper">
+				<div className="retweet_header">
+					<PaperClipOutlined />
+					{isMe ? <span>Вы ретвитнули</span> : <span>{tweet.user.login} ретвитнул(а)</span>}
+				</div>
+			</div>
+			<Tweet tweet={tweet.retweetBody} />
+		</div>
+	);
+};
+
 const Tweet = ({ tweet, query }) => {
 	const [showReply, setShowReply] = useState(false);
+	const me = useSelector((state) => state.users.me);
+	const dispatch = useDispatch();
 
-	const onClickTweetController = (e) => {
+	const onClickReply = (e) => {
 		e.preventDefault();
 		setShowReply((prev) => !prev);
+	};
+
+	const onClickRetweet = async (e) => {
+		e.preventDefault();
+		dispatch(tweet_add({ retweetId: tweet._id, retweetBody: tweet, me, type: 'Retweet' }));
+		dispatch(tweets_update({ id: tweet._id, path: 'retweet' }));
+	};
+
+	const onClickLike = async (e) => {
+		e.preventDefault();
+		dispatch(tweets_update({ id: tweet._id, path: 'like' }));
 	};
 
 	return (
@@ -70,16 +104,22 @@ const Tweet = ({ tweet, query }) => {
 						</div>
 						<div className="tweet_controllers">
 							<div className="controller">
-								<MessageOutlined className="icon" onClick={onClickTweetController} />{' '}
+								<MessageOutlined className="icon" onClick={onClickReply} />{' '}
 								<span className="controller_info">
 									{tweet.replies && tweet.replies.length > 0 && tweet.replies.length}
 								</span>
 							</div>
 							<div className="controller">
-								<PaperClipOutlined className="icon" />
+								<PaperClipOutlined className="icon" onClick={onClickRetweet} />
+								<span className="controller_info">
+									{tweet.retweettedBy && tweet.retweettedBy.length > 0 && tweet.retweettedBy.length}
+								</span>
 							</div>
 							<div className="controller">
-								<HeartOutlined className="icon" />
+								<HeartOutlined className="icon" onClick={onClickLike} />
+								<span className="controller_info">
+									{tweet.likedBy && tweet.likedBy.length > 0 && tweet.likedBy.length}
+								</span>
 							</div>
 							<div className="controller">
 								<ToTopOutlined className="icon" />
@@ -92,7 +132,7 @@ const Tweet = ({ tweet, query }) => {
 			<div className="tweet_reply">
 				{showReply && (
 					<NewTweet
-						responseTo={tweet._id}
+						parentTweet={tweet._id}
 						input={`@${tweet.user.login}, `}
 						cb={() => setShowReply((prev) => !prev)}
 					/>

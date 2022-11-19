@@ -24,7 +24,7 @@ function App() {
 		axios
 			.get('/me')
 			.then((res) => {
-				console.log('init', res);
+				console.log('App/useEffect_getMe', res);
 				setIsInitialized(true);
 				connectSocket(res.data.user);
 				dispatch(set_me(res.data.user));

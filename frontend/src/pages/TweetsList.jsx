@@ -1,6 +1,6 @@
 import NewTweet from '../components/NewTweet';
 import Spinner from '../components/Spinner';
-import Tweet from '../components/Tweet';
+import Tweet, { Retweet } from '../components/Tweet';
 import { useEffect } from 'react';
 import { tweets_download } from '../store/tweetsSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,7 +32,11 @@ const TweetsList = () => {
 					<Spinner />
 				) : loadingState === 'LOADED' && tweets ? (
 					tweets.map((t, idx) => {
-						return <Tweet key={idx} tweet={t} />;
+						return t.type === 'Retweet' ? (
+							<Retweet key={idx} tweet={t} />
+						) : (
+							<Tweet key={idx} tweet={t} />
+						);
 					})
 				) : (
 					<>Something went wrong</>

@@ -9,7 +9,7 @@ import { createRef } from 'react';
 import axios from 'axios';
 import { socket } from '../App';
 
-const NewTweet = ({ input, responseTo, cb }) => {
+const NewTweet = ({ input, parentTweet, cb }) => {
 	const [tweetBody, setTweetBody] = useState(input);
 	const [attachment, setAttachment] = useState('');
 	const [file, setFile] = useState('');
@@ -19,7 +19,17 @@ const NewTweet = ({ input, responseTo, cb }) => {
 	const addNewTweet = async () => {
 		axios
 			.post('/save', { file: attachment })
-			.then((res) => dispatch(tweet_add({ body: tweetBody, me, responseTo, attachment })));
+			.then((res) =>
+				dispatch(
+					tweet_add({
+						body: tweetBody,
+						me,
+						parentTweet,
+						attachment,
+						type: parentTweet ? 'Response' : 'Tweet',
+					}),
+				),
+			);
 		setTweetBody('');
 		setAttachment('');
 		cb && cb();

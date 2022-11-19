@@ -14,6 +14,7 @@ const Home = () => {
 	const navigate = useNavigate();
 
 	const handleSearch = () => {
+		setSearchQuery('');
 		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
 	};
 

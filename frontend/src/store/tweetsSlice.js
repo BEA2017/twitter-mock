@@ -10,11 +10,22 @@ export const tweets_download = createAsyncThunk('tweets/download', async (subscr
 export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
 	const response = await axios.post('/tweet', {
 		body: tweet.body,
-		responseTo: tweet.responseTo,
+		retweetBody: tweet.retweetId,
+		parentTweet: tweet.parentTweet,
 		attachment: tweet.attachment,
+		type: tweet.type,
 	});
-	socket.emit('new tweet', tweet.me._id);
-	return { ...response.data.tweet, user: tweet.me };
+	return {
+		...response.data.tweet,
+		retweetBody: tweet.retweetBody,
+		user: tweet.me,
+	};
+});
+
+export const tweets_update = createAsyncThunk('tweets/update', async ({ id, path }) => {
+	console.log('tweetsSlice/tweets_update', { id, path });
+	const response = await axios.patch('/tweet', { id, path });
+	return response.data.tweet;
 });
 
 const tweetsSlice = createSlice({
@@ -46,6 +57,16 @@ const tweetsSlice = createSlice({
 			})
 			.addCase(tweet_add.fulfilled, (state, action) => {
 				state.tweets = [{ ...action.payload }, ...state.tweets];
+				socket.emit('new tweet', action.payload.user._id);
+			})
+			.addCase(tweets_update.fulfilled, (state, action) => {
+				const tweet = action.payload;
+				state.tweets = state.tweets.map((t) =>
+					t._id === tweet._id
+						? { ...tweet, user: t.user, retweettedBy: tweet.retweettedBy, likedBy: tweet.likedBy }
+						: t,
+				);
+				socket.emit('new tweet', action.payload.user._id);
 			});
 	},
 });

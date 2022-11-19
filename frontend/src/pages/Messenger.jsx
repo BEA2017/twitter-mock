@@ -58,9 +58,26 @@ const Messenger = () => {
 					<div className="messenger_threads">
 						{threads.map((t, idx) => {
 							return (
-								<NavLink key={idx} to={`/im?sel=${t.companion.login}`} className={'navlink'}>
-									<ThreadItem companion={t.companion} message={t.messages[t.messages.length - 1]} />
-								</NavLink>
+								<>
+									<NavLink key={idx} to={`/im?sel=${t.companion.login}`} className={'navlink'}>
+										<ThreadItem
+											companion={t.companion}
+											message={t.messages[t.messages.length - 1]}
+										/>
+									</NavLink>
+									<NavLink key={idx} to={`/im?sel=${t.companion.login}`} className={'navlink'}>
+										<ThreadItem
+											companion={t.companion}
+											message={t.messages[t.messages.length - 1]}
+										/>
+									</NavLink>
+									<NavLink key={idx} to={`/im?sel=${t.companion.login}`} className={'navlink'}>
+										<ThreadItem
+											companion={t.companion}
+											message={t.messages[t.messages.length - 1]}
+										/>
+									</NavLink>
+								</>
 							);
 						})}
 					</div>

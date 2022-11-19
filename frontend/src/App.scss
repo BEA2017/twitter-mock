@@ -240,6 +240,8 @@ textarea, input[type="text"],input[type="password"]{
 
             .messenger_threads{
                 margin-top: 1em;
+                overflow-y: auto;
+                height: calc(100% - 44.31px - 81.53px - 1em);
 
                 .thread-item_container{
                     display: flex;
@@ -334,7 +336,6 @@ textarea, input[type="text"],input[type="password"]{
                 bottom: 0;
                 height: 80px;
                 width: 100%;
-                // padding: 0 25px;
                 border-top: 1px solid rgb(215, 215, 215);
                 display: flex;
                 align-items: center;
@@ -417,7 +418,7 @@ textarea, input[type="text"],input[type="password"]{
         border-left: 1px solid rgb(215, 215, 215);
         border-right: 1px solid rgb(215, 215, 215);
         padding: 0.3em 0.5em;
-
+        position: relative;
 
     }
     .home_right-sidebar{
@@ -682,12 +683,13 @@ textarea, input[type="text"],input[type="password"]{
 
 .tweet_container{
     display: flex;
-    padding: 0.25em 0.8em;
+    padding: 0.25em 1.5em;
     color: black;
+    margin: 0 -0.5em;
     
     .tweet_info{
         flex:1;
-        margin: 0.5em;
+        margin-left: 0.5em;
 
         .tweet_header_name{
             font-weight: 900;
@@ -700,8 +702,29 @@ textarea, input[type="text"],input[type="password"]{
     }
 }
 
+.retweet_container{
+    margin: 0 -0.5em;
+
+    .retweet_header{
+        margin-left: calc(1.5em + 100px + 0.5em);
+        font-size: 0.8em;
+        font-weight: 600;
+        color: rgb(115, 115, 115);
+    }
+
+    .tweet_container{
+        margin: 0;
+    }
+}
+
 .tweet_container:hover{
     background: rgb(236, 236, 236);
+}
+
+.retweet_container:hover{
+    .retweet_header-wrapper,.tweet_container{
+        background: rgb(236, 236, 236);
+    }
 }
 
 .tweet_reply{

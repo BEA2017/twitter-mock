@@ -27,6 +27,7 @@ router.post('/upload', upload.single('image'), FileController.upload);
 router.post('/save', FileController.savePersistent);
 
 router.post('/tweet', requireAuth, TweetController.create);
+router.patch('/tweet', requireAuth, TweetController.updateTweet);
 router.post('/tweets', requireAuth, TweetController.getTweets);
 
 router.post('/search', TweetController.searchTweets);

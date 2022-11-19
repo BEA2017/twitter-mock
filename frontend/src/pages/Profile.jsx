@@ -43,7 +43,7 @@ const Profile = () => {
 	useEffect(() => {
 		profile &&
 			axios.post('/tweets', { id: profile._id }).then((res) => {
-				setTweets(res.data.tweets);
+				setTweets(res.data.tweets.filter((t) => t.type === 'Tweet' || t.type === 'Response'));
 			});
 	}, [profile]);
 
