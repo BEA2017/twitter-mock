@@ -14,7 +14,7 @@ const TweetSchema = new mongoose.Schema(
 		attachment: String,
 		type: {
 			type: String,
-			enum: ['Tweet', 'Retweet', 'Response'],
+			enum: ['Tweet', 'Retweet', 'Reply'],
 		},
 		retweettedBy: [
 			{

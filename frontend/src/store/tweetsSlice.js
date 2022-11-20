@@ -18,6 +18,7 @@ export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
 	return {
 		...response.data.tweet,
 		retweetBody: tweet.retweetBody,
+		replies: tweet.replies,
 		user: tweet.me,
 	};
 });
@@ -56,6 +57,13 @@ const tweetsSlice = createSlice({
 				console.log(action.payload);
 			})
 			.addCase(tweet_add.fulfilled, (state, action) => {
+				if (action.payload.parentTweet) {
+					state.tweets = state.tweets.map((t) =>
+						t._id == action.payload.parentTweet
+							? (t = { ...t, replies: [{ ...action.payload }, ...t.replies] })
+							: t,
+					);
+				}
 				state.tweets = [{ ...action.payload }, ...state.tweets];
 				socket.emit('new tweet', action.payload.user._id);
 			})
@@ -63,7 +71,7 @@ const tweetsSlice = createSlice({
 				const tweet = action.payload;
 				state.tweets = state.tweets.map((t) =>
 					t._id === tweet._id
-						? { ...tweet, user: t.user, retweettedBy: tweet.retweettedBy, likedBy: tweet.likedBy }
+						? { ...t, retweettedBy: tweet.retweettedBy, likedBy: tweet.likedBy }
 						: t,
 				);
 				socket.emit('new tweet', action.payload.user._id);

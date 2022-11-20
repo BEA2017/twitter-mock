@@ -28,12 +28,31 @@ class TweetController {
 			});
 		const newTweets = await Promise.all(
 			tweets.map(async (t) => {
-				const replies = await Tweet.find({ parentTweet: t._id }).populate('user');
+				const replies = await Tweet.find({
+					parentTweet: t.retweetBody ? t.retweetBody._id : t._id,
+				}).populate('user');
 				const tweetWithReplies = { ...t._doc, replies };
 				return tweetWithReplies;
 			}),
 		);
 		return res.status(200).json({ tweets: newTweets });
+	}
+
+	async getTweet(req, res) {
+		const id = req.query.id;
+		console.log('TweetController/getTweet_id', id);
+		const tweet = await Tweet.findById(id).populate('user');
+		let parentTweet = tweet.parentTweet;
+		let tree = [];
+		while (parentTweet) {
+			const data = await Tweet.findById(parentTweet).populate('user');
+			tree.push(data);
+			parentTweet = data.parentTweet;
+		}
+		const replies = await Tweet.find({
+			parentTweet: tweet._id,
+		}).populate('user');
+		return res.status(200).json({ tweet, tree: tree.reverse(), replies });
 	}
 
 	async updateTweet(req, res) {

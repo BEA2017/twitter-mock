@@ -733,6 +733,22 @@ textarea, input[type="text"],input[type="password"]{
     left: 15%;
 }
 
+.selected-tweet_tree{
+    overflow: hidden;
+
+    .selected-tweet_tree-item .tweet_container > a.navlink{
+        position: relative;
+    }
+    .selected-tweet_tree-item .tweet_container > a.navlink:after{
+        content: '';
+        border: 2px solid rgb(193, 193, 193);
+        position: absolute;
+        left: 50%;
+        height: 200%;
+        pointer-events: none;
+    }
+}
+
 .selected-tweet_container{
 
     margin: 0.8em 1em;

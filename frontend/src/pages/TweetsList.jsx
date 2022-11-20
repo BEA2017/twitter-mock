@@ -31,13 +31,15 @@ const TweetsList = () => {
 				{loadingState === 'NEVER' || loadingState === 'LOADING' ? (
 					<Spinner />
 				) : loadingState === 'LOADED' && tweets ? (
-					tweets.map((t, idx) => {
-						return t.type === 'Retweet' ? (
-							<Retweet key={idx} tweet={t} />
-						) : (
-							<Tweet key={idx} tweet={t} />
-						);
-					})
+					tweets
+						.filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
+						.map((t, idx) => {
+							return t.type === 'Retweet' ? (
+								<Retweet key={idx} tweet={t} />
+							) : (
+								<Tweet key={idx} tweet={t} />
+							);
+						})
 				) : (
 					<>Something went wrong</>
 				)}

@@ -52,7 +52,7 @@ export const Retweet = ({ tweet }) => {
 					{isMe ? <span>Вы ретвитнули</span> : <span>{tweet.user.login} ретвитнул(а)</span>}
 				</div>
 			</div>
-			<Tweet tweet={tweet.retweetBody} />
+			<Tweet tweet={{ ...tweet.retweetBody, replies: tweet.replies }} />
 		</div>
 	);
 };

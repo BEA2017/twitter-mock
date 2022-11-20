@@ -17,19 +17,17 @@ const NewTweet = ({ input, parentTweet, cb }) => {
 	const dispatch = useDispatch();
 
 	const addNewTweet = async () => {
-		axios
-			.post('/save', { file: attachment })
-			.then((res) =>
-				dispatch(
-					tweet_add({
-						body: tweetBody,
-						me,
-						parentTweet,
-						attachment,
-						type: parentTweet ? 'Response' : 'Tweet',
-					}),
-				),
-			);
+		axios.post('/save', { file: attachment }).then((res) =>
+			dispatch(
+				tweet_add({
+					body: tweetBody,
+					me,
+					parentTweet,
+					attachment,
+					type: parentTweet ? 'Reply' : 'Tweet',
+				}),
+			),
+		);
 		setTweetBody('');
 		setAttachment('');
 		cb && cb();
