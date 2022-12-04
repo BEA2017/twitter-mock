@@ -31,21 +31,23 @@ class UserController {
 
 	async register(req, res) {
 		const data = req.body;
-		const existed = await User.findOne({ login: data.login });
-		if (existed) return res.status(400).json({ message: 'This login already in use' });
+		let existed = await User.findOne({ login: data.login });
+		if (existed) return res.status(400).json({ message: 'Логин уже используется' });
+		existed = await User.findOne({ email: data.email });
+		if (existed) return res.status(400).json({ message: 'Email уже используется' });
 		const salt = bcrypt.genSaltSync(10);
 		const hashedPassword = await bcrypt.hashSync(data.password, salt);
 		const user = new User({ ...data, password: hashedPassword, confirmed: false });
 		await user.save();
-		res.status(201).json({ message: 'user created' });
+		res.status(201).json({ message: 'Пользователь создан' });
 	}
 
 	async login(req, res) {
 		const data = req.body;
 		const existed = await User.findOne({ login: data.login }).populate('subscriptions');
-		if (!existed) return res.status(400).json({ message: 'Incorrect credentials' });
+		if (!existed) return res.status(400).json({ message: 'Неверные данные' });
 		const validationSuccess = await bcrypt.compareSync(data.password, existed.password);
-		if (!validationSuccess) return res.status(400).json({ message: 'Incorrect credentials' });
+		if (!validationSuccess) return res.status(400).json({ message: 'Неверные данные' });
 		const token = jwt.sign({ userId: existed._id }, process.env.JWT_SECRET);
 		res.cookie('token', token, { httpOnly: true });
 		res.status(200).json({ user: existed });

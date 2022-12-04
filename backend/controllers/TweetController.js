@@ -40,13 +40,13 @@ class TweetController {
 
 	async getTweet(req, res) {
 		const id = req.query.id;
-		console.log('TweetController/getTweet_id', id);
 		const tweet = await Tweet.findById(id).populate('user');
 		let parentTweet = tweet.parentTweet;
 		let tree = [];
 		while (parentTweet) {
 			const data = await Tweet.findById(parentTweet).populate('user');
-			tree.push(data);
+			const replies = await Tweet.find({ parentTweet: data._id });
+			tree.push({ ...data._doc, user: data.user, replies });
 			parentTweet = data.parentTweet;
 		}
 		const replies = await Tweet.find({

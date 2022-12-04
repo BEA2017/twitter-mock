@@ -21,6 +21,22 @@ const TweetsList = () => {
 			dispatch(tweets_download([...me.subscriptions, me._id]));
 		});
 
+	const renderTweetList = (tweets) => {
+		if (tweets.length === 0) {
+			return <EmptyList />;
+		} else {
+			return tweets
+				.filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
+				.map((t, idx) => {
+					return t.type === 'Retweet' ? (
+						<Retweet key={idx} tweet={t} />
+					) : (
+						<Tweet key={idx} tweet={t} />
+					);
+				});
+		}
+	};
+
 	return (
 		<>
 			<header>
@@ -31,20 +47,23 @@ const TweetsList = () => {
 				{loadingState === 'NEVER' || loadingState === 'LOADING' ? (
 					<Spinner />
 				) : loadingState === 'LOADED' && tweets ? (
-					tweets
-						.filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
-						.map((t, idx) => {
-							return t.type === 'Retweet' ? (
-								<Retweet key={idx} tweet={t} />
-							) : (
-								<Tweet key={idx} tweet={t} />
-							);
-						})
+					renderTweetList(tweets)
 				) : (
 					<>Something went wrong</>
 				)}
 			</main>
 		</>
+	);
+};
+
+const EmptyList = () => {
+	return (
+		<div style={{ textAlign: 'center' }}>
+			<h1 style={{ marginBottom: '1em' }}>Добро пожаловать в твиттер!</h1>
+			<h4>Следите за популярными темами</h4>
+			<div>а также</div>
+			<h4>Делитесь своими эмоциями</h4>
+		</div>
 	);
 };
 

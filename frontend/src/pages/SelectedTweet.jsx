@@ -37,14 +37,14 @@ const SelectedTweet = () => {
 				{tweet.tree &&
 					tweet.tree.map((t, idx) => {
 						return (
-							<div className="selected-tweet_tree-item">
-								<Tweet key={idx} tweet={t} />
+							<div className="selected-tweet_tree-item" key={idx}>
+								<Tweet tweet={t} />
 							</div>
 						);
 					})}
 			</div>
 			<div className="selected-tweet_container">
-				<div className="selected-tweet">
+				<div className={`selected-tweet ${tweet.tree.length > 0 && 'selected-tweet_tree-root'}`}>
 					<div className="selected-tweet_user">
 						<Avatar src={`/images/${tweet.tweet.user.avatar}`} />
 						<div className="userinfo">

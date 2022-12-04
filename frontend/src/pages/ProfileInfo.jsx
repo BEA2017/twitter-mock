@@ -77,16 +77,20 @@ const ProfileInfo = ({ cb }) => {
 				/>
 			</div>
 			<div className="profile_name">
+				<label htmlFor="name">Имя</label>
 				<input
 					type={'text'}
+					id="name"
 					value={name}
 					placeholder={'Имя'}
 					onChange={(e) => setName(e.target.value)}
 				/>
 			</div>
 			<div className="profile_surname">
+				<label htmlFor="surname">Фамилия</label>
 				<input
 					type={'text'}
+					id="surname"
 					value={surname}
 					placeholder={'Фамилия'}
 					onChange={(e) => setSurname(e.target.value)}
@@ -96,24 +100,30 @@ const ProfileInfo = ({ cb }) => {
 				<input type={text} value={avatar} onChange={(e) => setAvatar(e)} />
 			</div> */}
 			<div className="profile_about">
+				<label htmlFor="about">О себе</label>
 				<input
 					type={'text'}
+					id="about"
 					value={about}
 					placeholder={'О себе'}
 					onChange={(e) => setAbout(e.target.value)}
 				/>
 			</div>
 			<div className="profile_city">
+				<label htmlFor="city">Город</label>
 				<input
 					type={'text'}
+					id="city"
 					value={city}
 					placeholder={'Город'}
 					onChange={(e) => setCity(e.target.value)}
 				/>
 			</div>
 			<div className="profile_webpage">
+				<label htmlFor="webpage">Сайт</label>
 				<input
 					type={'text'}
+					id="webpage"
 					value={webpage}
 					placeholder={'Веб-страница'}
 					onChange={(e) => setWebpage(e.target.value)}
