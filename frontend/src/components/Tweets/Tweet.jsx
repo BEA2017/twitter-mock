@@ -5,17 +5,18 @@ import {
 	ToTopOutlined,
 	UserOutlined,
 } from '@ant-design/icons';
-import '../App.scss';
+import '../../App.scss';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import NewTweet from './NewTweet';
-import { dateFormatter } from '../utils/dateFormatter';
-import { Avatar } from './Avatar';
-import WithNavLink from '../utils/WithNavLink';
+import { dateFormatter } from '../../utils/dateFormatter';
+import { Avatar } from '../Profile/Avatar';
+import WithNavLink from '../../utils/WithNavLink';
 import { useDispatch, useSelector } from 'react-redux';
-import { tweets_update, tweet_add } from '../store/tweetsSlice';
+import { tweets_update, tweet_add } from '../../store/tweetsSlice';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { getUserById } from '../../store/userSlice';
 
 const bodyFormatter = (body, query) => {
 	const matchIndexes = [];
@@ -42,17 +43,19 @@ const bodyFormatter = (body, query) => {
 
 export const Retweet = ({ tweet }) => {
 	const me = useSelector((state) => state.users.me);
-	const [isMe, setIsMe] = useState(me._id === tweet.user._id);
+	const retwittedBy = useSelector((state) => state.users.users[tweet.user]);
+	const quotedAuthor = useSelector((state) => state.users.users[tweet.retweetBody.user._id]);
+	const [isMe, setIsMe] = useState(me._id === quotedAuthor);
 
 	return (
 		<div className="retweet_container">
 			<div className="retweet_header-wrapper">
 				<div className="retweet_header">
 					<PaperClipOutlined />
-					{isMe ? <span>Вы ретвитнули</span> : <span>{tweet.user.login} ретвитнул(а)</span>}
+					{isMe ? <span>Вы ретвитнули</span> : <span>{retwittedBy.login} ретвитнул(а)</span>}
 				</div>
 			</div>
-			<Tweet tweet={{ ...tweet.retweetBody, replies: tweet.replies }} />
+			<Tweet tweet={{ ...tweet.retweetBody, user: quotedAuthor._id }} />
 		</div>
 	);
 };
@@ -60,6 +63,7 @@ export const Retweet = ({ tweet }) => {
 const Tweet = ({ tweet, query }) => {
 	const [showReply, setShowReply] = useState(false);
 	const me = useSelector((state) => state.users.me);
+	const author = useSelector((state) => state.users.users[tweet.user]);
 	const dispatch = useDispatch();
 
 	const onClickReply = (e) => {
@@ -81,15 +85,15 @@ const Tweet = ({ tweet, query }) => {
 	return (
 		<>
 			<div className="tweet_container">
-				<WithNavLink username={`/${tweet.user.login}`}>
-					{tweet.user.avatar ? <Avatar src={`/images/${tweet.user.avatar}`} /> : <Avatar />}
+				<WithNavLink username={`/${author?.login}`}>
+					{author?.avatar ? <Avatar src={`/images/${author.avatar}`} /> : <Avatar />}
 				</WithNavLink>
 				<div className="tweet_info">
-					<NavLink to={`/${tweet.user.login}`} className={'navlink'}>
+					<NavLink to={`/${author?.login}`} className={'navlink'}>
 						<span className="tweet_header_name">
-							{tweet.user?.name} {tweet.user?.surname}
+							{author?.name} {author?.surname}
 						</span>
-						<span className="tweet_header_login"> @{tweet.user?.login}</span>
+						<span className="tweet_header_login"> @{author?.login}</span>
 					</NavLink>
 					<NavLink to={`/tweets/${tweet._id}`} className="navlink">
 						<span className="tweet_header_date">
@@ -133,7 +137,7 @@ const Tweet = ({ tweet, query }) => {
 				{showReply && (
 					<NewTweet
 						parentTweet={tweet._id}
-						input={`@${tweet.user.login}, `}
+						input={`@${author.login}, `}
 						cb={() => setShowReply((prev) => !prev)}
 					/>
 				)}

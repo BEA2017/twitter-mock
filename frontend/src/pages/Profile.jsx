@@ -9,22 +9,21 @@ import {
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import BackButton from '../components/BackButton';
-import { Modal } from '../components/Modal';
-import ProfileInfo from './ProfileInfo';
-import { ProfileAvatar } from '../components/Avatar';
+import BackButton from '../components/Utils/BackButton';
+import { Modal } from '../components/Utils/Modal';
+import ProfileInfo from '../components/Profile/ProfileInfo';
+import { ProfileAvatar } from '../components/Profile/Avatar';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { updateFollowList } from '../store/userSlice';
-import Spinner from '../components/Spinner';
-import Tweet from '../components/Tweet';
+import Spinner from '../components/Layout/Spinner';
+import TweetsList from '../components/Tweets/TweetsList';
 
 const Profile = () => {
 	const login = useParams().profile;
 	const [profile, setProfile] = useState();
-	const [panelItem, setPanelItem] = useState(0);
+	const [menuIndex, setMenuIndex] = useState(0);
 	const me = useSelector((state) => state.users.me);
-	const [tweets, setTweets] = useState();
 	const [showModal, setShowModal] = useState(false);
 	const dispatch = useDispatch();
 
@@ -36,22 +35,18 @@ const Profile = () => {
 
 		getProfileInfo().then((res) => {
 			setProfile(res);
-			console.log(res);
 		});
 	}, [login, me]);
 
-	useEffect(() => {
-		profile &&
-			axios.post('/tweets', { id: profile._id }).then((res) => {
-				setTweets(res.data.tweets.filter((t) => t.type === 'Tweet' || t.type === 'Reply'));
-			});
-	}, [profile]);
-
 	const handlePanelItemClick = async (idx) => {
-		setPanelItem(idx);
-		axios.post('/tweets', { id: profile._id }).then((res) => {
-			setTweets(res.data.tweets);
-		});
+		setMenuIndex(idx);
+	};
+
+	const menu = {
+		Твиты: 'TWEETS',
+		'Твиты и ответы': 'TWEETS_AND_REPLIES',
+		Медиа: 'MEDIA',
+		Нравится: 'LIKES',
 	};
 
 	if (!profile) return <Spinner />;
@@ -137,10 +132,10 @@ const Profile = () => {
 					</div>
 				</div>
 				<ul className="profile_panel">
-					{['Твиты', 'Твиты и ответы', 'Медиа', 'Нравится'].map((i, idx) => {
+					{Object.keys(menu).map((i, idx) => {
 						return (
 							<li
-								className={`item ${idx === panelItem ? 'item-active' : ''}`}
+								className={`item ${idx === menuIndex ? 'item-active' : ''}`}
 								onClick={() => handlePanelItemClick(idx)}
 								key={idx}>
 								{i}
@@ -149,10 +144,10 @@ const Profile = () => {
 					})}
 				</ul>
 				<div className="profile_tweets">
-					{tweets &&
-						tweets.map((i, idx) => {
-							return <Tweet key={idx} tweet={i} />;
-						})}
+					<TweetsList
+						user={profile}
+						request={{ path: `/${profile.login}`, type: menu[Object.keys(menu)[menuIndex]] }}
+					/>
 				</div>
 			</div>
 		</>

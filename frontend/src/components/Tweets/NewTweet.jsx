@@ -1,13 +1,13 @@
-import '../App.scss';
+import '../../App.scss';
 import { FileImageOutlined, SmileOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { tweet_add } from '../store/tweetsSlice';
-import Profile from '../pages/Profile';
-import { Avatar } from './Avatar';
+import { tweet_add } from '../../store/tweetsSlice';
+import Profile from '../../pages/Profile';
+import { Avatar } from '../Profile/Avatar';
 import { createRef } from 'react';
 import axios from 'axios';
-import { socket } from '../App';
+import { socket } from '../../App';
 
 const NewTweet = ({ input, parentTweet, cb }) => {
 	const [tweetBody, setTweetBody] = useState(input);

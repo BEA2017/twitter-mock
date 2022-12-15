@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import BackButton from '../components/BackButton';
-import Spinner from '../components/Spinner';
-import Tweet from '../components/Tweet';
+import BackButton from '../components/Utils/BackButton';
+import Spinner from '../components/Layout/Spinner';
+import Tweet from '../components/Tweets/Tweet';
 
 const SearchPage = () => {
 	const [params, setParams] = useSearchParams();

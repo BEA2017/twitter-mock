@@ -1,19 +1,19 @@
 import { Routes, Route, Navigate } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
-import StartingPage from './pages/StartingPage';
+import StartingPage from './pages/SignIn';
 import Home from './pages/Home';
-import TweetsList from './pages/TweetsList';
 import SelectedTweet from './pages/SelectedTweet';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { set_me } from './store/userSlice';
 import Profile from './pages/Profile';
-import Spinner from './components/Spinner';
+import Spinner from './components/Layout/Spinner';
 import SearchPage from './pages/SearchPage';
 import Messenger from './pages/Messenger';
 import { connectSocket } from './store/sockets';
+import Feed from './pages/Feed';
 
 function App() {
 	const loggedUser = useSelector((state) => state.users.me);
@@ -24,7 +24,6 @@ function App() {
 		axios
 			.get('/me')
 			.then((res) => {
-				console.log('App/useEffect_getMe', res);
 				setIsInitialized(true);
 				connectSocket(res.data.user);
 				dispatch(set_me(res.data.user));
@@ -40,7 +39,7 @@ function App() {
 				{loggedUser ? (
 					<Routes>
 						<Route path="/" element={<Home />}>
-							<Route index element={<TweetsList />} />
+							<Route index element={<Feed me={loggedUser} />} />
 							<Route path={'tweets/:id'} element={<SelectedTweet />} />
 							<Route path={'/search'} element={<SearchPage />} />
 							<Route path={'/:profile'} element={<Profile />} />

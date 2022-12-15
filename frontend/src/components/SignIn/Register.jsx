@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
-import '../App.scss';
-import { validateRegistration } from '../utils/validators';
+import '../../App.scss';
+import { validateRegistration } from '../../utils/validators';
 import { CheckOutlined, WarningOutlined } from '@ant-design/icons';
 
 const Register = () => {

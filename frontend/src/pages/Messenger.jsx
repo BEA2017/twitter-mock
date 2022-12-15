@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useSearchParams } from 'react-router-dom';
-import { Avatar, AvatarSmall } from '../components/Avatar';
-import ContactsCarousel from '../components/ContactsCarousel';
-import Logo from '../components/Logo';
-import Navbar from '../components/Navbar';
-import ThreadItem from '../components/ThreadItem';
-import MessengerChat from './MessengerChat';
+import { Avatar, AvatarSmall } from '../components/Profile/Avatar';
+import ContactsCarousel from '../components/Messenger/ContactsCarousel';
+import Logo from '../components/Layout/Logo';
+import Navbar from '../components/Layout/Navbar';
+import ThreadItem from '../components/Messenger/ThreadItem';
+import MessengerChat from '../components/Messenger/MessengerChat';
 
 const Messenger = () => {
 	const [contacts, setContacts] = useState([]);

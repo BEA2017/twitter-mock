@@ -3,8 +3,8 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Avatar } from '../components/Avatar';
-import { updateProfileInfo } from '../store/userSlice';
+import { Avatar } from './Avatar';
+import { updateProfileInfo } from '../../store/userSlice';
 
 const ProfileInfo = ({ cb }) => {
 	const me = useSelector((state) => state.users.me);

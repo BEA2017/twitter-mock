@@ -16,44 +16,108 @@ class TweetController {
 	}
 
 	async getTweets(req, res) {
-		const id = req.body.id;
-		const tweets = await Tweet.find({ user: { $in: id } })
-			.sort({ createdAt: -1 })
-			.populate('user')
-			.populate({
-				path: 'retweetBody',
-				populate: {
-					path: 'user',
-				},
-			});
-		const newTweets = await Promise.all(
-			tweets.map(async (t) => {
-				const replies = await Tweet.find({
-					parentTweet: t.retweetBody ? t.retweetBody._id : t._id,
-				}).populate('user');
-				const tweetWithReplies = { ...t._doc, replies };
-				return tweetWithReplies;
-			}),
-		);
-		return res.status(200).json({ tweets: newTweets });
+		const subscriptionIds = req.body.subscriptionIds;
+		const userId = req.body.userId;
+		const requestType = req.body.requestType;
+		let tweets = [];
+		switch (requestType) {
+			case 'FEED':
+				tweets = await Tweet.find({ user: { $in: subscriptionIds } })
+					.populate({
+						path: 'retweetBody',
+						populate: {
+							path: 'user',
+						},
+					})
+					.sort({ createdAt: -1 });
+				break;
+			case 'TWEETS':
+				tweets = await Tweet.find({ user: userId })
+					.populate({
+						path: 'retweetBody',
+						populate: {
+							path: 'user',
+						},
+					})
+					.sort({ createdAt: -1 });
+				break;
+			case 'TWEETS_AND_REPLIES':
+				tweets = await Tweet.find({ user: { $in: subscriptionIds } })
+					.populate({
+						path: 'retweetBody',
+						populate: {
+							path: 'user',
+						},
+					})
+					.sort({ createdAt: -1 });
+				break;
+			case 'LIKES':
+				tweets = await Tweet.find({ likedBy: userId })
+					.populate({
+						path: 'retweetBody',
+						populate: {
+							path: 'user',
+						},
+					})
+					.sort({ createdAt: -1 });
+		}
+		return res.status(200).json({ tweets });
 	}
+	// async getTweets(req, res) {
+	// 	const id = req.body.id;
+	// 	const tweets = await Tweet.find({ user: { $in: id } })
+	// 		.sort({ createdAt: -1 })
+	// 		.populate('user')
+	// 		.populate({
+	// 			path: 'retweetBody',
+	// 			populate: {
+	// 				path: 'user',
+	// 			},
+	// 		});
+	// 	const newTweets = await Promise.all(
+	// 		tweets.map(async (t) => {
+	// 			const replies = await Tweet.find({
+	// 				parentTweet: t.retweetBody ? t.retweetBody._id : t._id,
+	// 			}).populate('user');
+	// 			const tweetWithReplies = { ...t._doc, replies };
+	// 			return tweetWithReplies;
+	// 		}),
+	// 	);
+	// 	return res.status(200).json({ tweets: newTweets });
+	// }
 
 	async getTweet(req, res) {
 		const id = req.query.id;
-		const tweet = await Tweet.findById(id).populate('user');
+		const tweet = await Tweet.findById(id);
 		let parentTweet = tweet.parentTweet;
 		let tree = [];
 		while (parentTweet) {
-			const data = await Tweet.findById(parentTweet).populate('user');
+			const data = await Tweet.findById(parentTweet);
 			const replies = await Tweet.find({ parentTweet: data._id });
-			tree.push({ ...data._doc, user: data.user, replies });
+			tree.push({ ...data._doc, replies });
 			parentTweet = data.parentTweet;
 		}
 		const replies = await Tweet.find({
 			parentTweet: tweet._id,
-		}).populate('user');
+		});
 		return res.status(200).json({ tweet, tree: tree.reverse(), replies });
 	}
+	// async getTweet(req, res) {
+	// 	const id = req.query.id;
+	// 	const tweet = await Tweet.findById(id).populate('user');
+	// 	let parentTweet = tweet.parentTweet;
+	// 	let tree = [];
+	// 	while (parentTweet) {
+	// 		const data = await Tweet.findById(parentTweet).populate('user');
+	// 		const replies = await Tweet.find({ parentTweet: data._id });
+	// 		tree.push({ ...data._doc, user: data.user, replies });
+	// 		parentTweet = data.parentTweet;
+	// 	}
+	// 	const replies = await Tweet.find({
+	// 		parentTweet: tweet._id,
+	// 	}).populate('user');
+	// 	return res.status(200).json({ tweet, tree: tree.reverse(), replies });
+	// }
 
 	async updateTweet(req, res) {
 		const { id, path } = req.body;

@@ -2,7 +2,7 @@ import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { AvatarSmall } from './Avatar';
+import { AvatarSmall } from '../Profile/Avatar';
 
 const ContactsCarousel = ({ contacts }) => {
 	const carouselRef = React.createRef();

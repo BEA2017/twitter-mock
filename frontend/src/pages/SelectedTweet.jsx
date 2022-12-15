@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import Tweet from '../components/Tweet';
+import Tweet from '../components/Tweets/Tweet';
 import {
 	HeartOutlined,
 	MessageOutlined,
@@ -9,59 +9,62 @@ import {
 	ToTopOutlined,
 	UserOutlined,
 } from '@ant-design/icons';
-import BackButton from '../components/BackButton';
-import { Avatar } from '../components/Avatar';
-import NewTweet from '../components/NewTweet';
+import BackButton from '../components/Utils/BackButton';
+import { Avatar } from '../components/Profile/Avatar';
+import NewTweet from '../components/Tweets/NewTweet';
 import axios from 'axios';
-import Spinner from '../components/Spinner';
+import Spinner from '../components/Layout/Spinner';
+import { tweet_by_id } from '../store/tweetsSlice';
+import useTweetsLoader from '../utils/useTweetsLoader';
 
 const SelectedTweet = () => {
 	const { id } = useParams();
-	const [tweet, setTweet] = useState();
-	const [isInitialized, setIsInitialized] = useState(false);
+	const { tweets, state } = useTweetsLoader({ request: { type: 'TWEET' }, tweetId: id });
+	const users = useSelector((state) => state.users.users);
 
-	useEffect(() => {
-		setIsInitialized(false);
-		axios.get(`/tweet?id=${id}`).then((res) => {
-			setTweet(res.data);
-			setIsInitialized(true);
-		});
-	}, [id]);
+	// useEffect(() => {
+	// 	dispatch(tweet_by_id(id));
+	// 	setIsInitialized(false);
+	// 	axios.get(`/tweet?id=${id}`).then((res) => {
+	// 		console.log('SelectedTweet/useEffect', res.data);
+	// 		setTweet(res.data);
+	// 		setIsInitialized(true);
+	// 	});
+	// }, [id]);
 
-	if (!isInitialized) return <Spinner />;
+	if (!tweets || state !== 'LOADED') return <Spinner />;
 
-	return tweet ? (
+	return tweets.tweet ? (
 		<>
 			<BackButton />
 			<div className="selected-tweet_tree">
-				{tweet.tree &&
-					tweet.tree.map((t, idx) => {
-						return (
-							<div className="selected-tweet_tree-item" key={idx}>
-								<Tweet tweet={t} />
-							</div>
-						);
-					})}
+				{tweets.tree.map((t, idx) => {
+					return (
+						<div className="selected-tweet_tree-item" key={idx}>
+							<Tweet tweet={t} />
+						</div>
+					);
+				})}
 			</div>
 			<div className="selected-tweet_container">
-				<div className={`selected-tweet ${tweet.tree.length > 0 && 'selected-tweet_tree-root'}`}>
+				<div className={`selected-tweet ${tweets.tree.length > 0 && 'selected-tweet_tree-root'}`}>
 					<div className="selected-tweet_user">
-						<Avatar src={`/images/${tweet.tweet.user.avatar}`} />
+						<Avatar src={`/images/${users[tweets.tweet.user].avatar}`} />
 						<div className="userinfo">
 							<div className="userinfo_username">
-								{tweet.tweet.user.name} {tweet.tweet.user.surname}
+								{users[tweets.tweet.user].name} {users[tweets.tweet.user].surname}
 							</div>
-							<div className="userinfo_login">@{tweet.tweet.user.login}</div>
+							<div className="userinfo_login">@{users[tweets.tweet.user].login}</div>
 						</div>
 					</div>
 					<div className="tweet_body selected-tweet_body">
-						<p>{tweet.tweet.body}</p>
+						<p>{tweets.tweet.body}</p>
 						<div className="tweet_attachments selected-tweet_attachments">
-							{tweet.tweet.attachment && <img src={`/images/${tweet.tweet.attachment}`} />}
+							{tweets.tweet.attachment && <img src={`/images/${tweets.tweet.attachment}`} />}
 						</div>
 					</div>
 					<div className="selected-tweet_date">
-						<span>{new Date(tweet.tweet.createdAt).toLocaleString()}</span>
+						<span>{new Date(tweets.tweet.createdAt).toLocaleString()}</span>
 					</div>
 					<div className="tweet_controllers">
 						<MessageOutlined className="icon" />
@@ -72,14 +75,12 @@ const SelectedTweet = () => {
 				</div>
 			</div>
 			<div className="selected-tweet_new-reply">
-				<NewTweet parentTweet={tweet.tweet._id} />
+				<NewTweet parentTweet={tweets.tweet._id} />
 			</div>
 			<div className="selected-tweet_replies">
-				{tweet.replies &&
-					tweet.replies.length > 0 &&
-					tweet.replies.map((r, idx) => {
-						return <Tweet key={idx} tweet={r} />;
-					})}
+				{tweets.replies.map((r, idx) => {
+					return <Tweet key={idx} tweet={r} />;
+				})}
 			</div>
 		</>
 	) : (

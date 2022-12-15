@@ -1,4 +1,4 @@
-import Message from '../components/Message';
+import Message from './Message';
 
 const MessengerChatBody = ({ messages }) => {
 	let currentDate;

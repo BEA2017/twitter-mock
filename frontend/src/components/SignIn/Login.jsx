@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../App.scss';
+import '../../App.scss';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { set_me } from '../store/userSlice';
-import { connectSocket } from '../store/sockets';
+import { set_me } from '../../store/userSlice';
+import { connectSocket } from '../../store/sockets';
 import { WarningOutlined } from '@ant-design/icons';
 
 const Login = () => {

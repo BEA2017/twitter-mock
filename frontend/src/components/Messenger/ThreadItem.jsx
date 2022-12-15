@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { AvatarSmall } from './Avatar';
+import { AvatarSmall } from '../Profile/Avatar';
 
 const ThreadItem = ({ companion, message }) => {
 	const me = useSelector((state) => state.users.me);

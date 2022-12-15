@@ -1,9 +1,9 @@
 import { MessageOutlined, SearchOutlined, TeamOutlined, TwitterOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import '../App.scss';
-import { Modal } from '../components/Modal';
-import Login from './Login';
-import Register from './Register';
+import { Modal } from '../components/Utils/Modal';
+import Login from '../components/SignIn/Login';
+import Register from '../components/SignIn/Register';
 
 const StartingPage = () => {
 	const [registerOpen, setRegisterOpen] = useState(false);

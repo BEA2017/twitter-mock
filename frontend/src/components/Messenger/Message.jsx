@@ -1,5 +1,5 @@
-import { dateFormatter, messengerTimeFormatter } from '../utils/dateFormatter';
-import { AvatarSmall } from './Avatar';
+import { dateFormatter, messengerTimeFormatter } from '../../utils/dateFormatter';
+import { AvatarSmall } from '../Profile/Avatar';
 
 const Message = ({ message }) => {
 	return (

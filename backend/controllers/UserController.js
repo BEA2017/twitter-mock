@@ -8,7 +8,10 @@ class UserController {
 		if (!token) return res.status(302).send();
 		try {
 			const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
-			const user = await User.findOne({ _id: decodedToken.userId }).populate('subscriptions');
+			const user = await User.findOne({ _id: decodedToken.userId }).populate({
+				path: 'subscriptions',
+				select: ['_id', 'login', 'name', 'surname', 'avatar'],
+			});
 			return res.status(200).json({ user });
 		} catch (e) {
 			return res.status(400).send();
@@ -16,14 +19,32 @@ class UserController {
 	}
 
 	async getProfileInfo(req, res) {
-		const data = req.query;
+		const { login, id } = req.query;
 		try {
+			const query = login ? { login } : { _id: id };
 			const user = await User.findOne(
-				{ login: data.login },
+				query,
 				'_id name surname login about avatar city webpage subscriptions',
 			);
 			const subscribers = await User.count({ subscriptions: { $in: user._id } });
 			return res.status(200).json({ user: { ...user._doc, subscribers } });
+		} catch (e) {
+			return e;
+		}
+	}
+
+	async getProfiles(req, res) {
+		const { ids } = req.body;
+		try {
+			const users = await Promise.all(
+				ids.map(async (id) => {
+					return await User.findOne(
+						{ _id: id },
+						'_id name surname login about avatar city webpage subscriptions',
+					);
+				}),
+			);
+			return res.status(200).json({ users });
 		} catch (e) {
 			return e;
 		}

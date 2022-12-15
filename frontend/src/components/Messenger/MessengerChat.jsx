@@ -10,10 +10,10 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Avatar } from '../components/Avatar';
-import Message from '../components/Message';
-import Spinner from '../components/Spinner';
-import { socket } from '../store/sockets';
+import { Avatar } from '../Profile/Avatar';
+import Message from './Message';
+import Spinner from '../Layout/Spinner';
+import { socket } from '../../store/sockets';
 import MessengerChatBody from './MessengerChatBody';
 
 const MessengerChat = ({ sel, cb }) => {
