@@ -20,47 +20,34 @@ class TweetController {
 		const userId = req.body.userId;
 		const requestType = req.body.requestType;
 		let tweets = [];
-		switch (requestType) {
-			case 'FEED':
-				tweets = await Tweet.find({ user: { $in: subscriptionIds } })
-					.populate({
-						path: 'retweetBody',
-						populate: {
-							path: 'user',
-						},
-					})
-					.sort({ createdAt: -1 });
-				break;
-			case 'TWEETS':
-				tweets = await Tweet.find({ user: userId })
-					.populate({
-						path: 'retweetBody',
-						populate: {
-							path: 'user',
-						},
-					})
-					.sort({ createdAt: -1 });
-				break;
-			case 'TWEETS_AND_REPLIES':
-				tweets = await Tweet.find({ user: { $in: subscriptionIds } })
-					.populate({
-						path: 'retweetBody',
-						populate: {
-							path: 'user',
-						},
-					})
-					.sort({ createdAt: -1 });
-				break;
-			case 'LIKES':
-				tweets = await Tweet.find({ likedBy: userId })
-					.populate({
-						path: 'retweetBody',
-						populate: {
-							path: 'user',
-						},
-					})
-					.sort({ createdAt: -1 });
-		}
+		let query = {
+			FEED: { user: { $in: subscriptionIds }, type: { $in: ['Tweet', 'Retweet'] } },
+			TWEETS: { user: userId, type: { $in: ['Tweet', 'Retweet'] } },
+			TWEETS_AND_REPLIES: { user: userId },
+			LIKES: { likedBy: userId },
+		};
+		tweets = await Tweet.find(query[requestType]);
+		let retwitted = [];
+		await Promise.all(
+			tweets.map(async (t) => {
+				if (t.retweetBody) {
+					const tweet = await Tweet.findOne({ _id: t.retweetBody });
+					retwitted.push(tweet);
+				}
+			}),
+		);
+		tweets = tweets.concat(...retwitted).sort((a, b) => b.createdAt - a.createdAt);
+		tweets = await Promise.all(
+			tweets.map(async (t) => {
+				const replies = await Tweet.find(
+					{
+						parentTweet: t.retweetBody ? t.retweetBody : t._id,
+					},
+					'_id',
+				);
+				return { ...t._doc, replies };
+			}),
+		);
 		return res.status(200).json({ tweets });
 	}
 	// async getTweets(req, res) {
@@ -124,25 +111,25 @@ class TweetController {
 		const me = req.userId;
 		console.log('TweetController/UpdateTweet', me);
 		const tweet = await Tweet.findById(id);
-		if (path === 'like') {
-			let exists = tweet.likedBy.find((id) => id == me);
+		let exists = tweet[path].find((id) => id == me);
+		if (path === 'likedBy') {
 			exists
 				? (tweet.likedBy = tweet.likedBy.filter((id) => id != me))
 				: (tweet.likedBy = [...tweet.likedBy, me]);
 		}
-		if (path === 'retweet') {
-			let exists = tweet.retweettedBy.find((id) => id == me);
+		if (path === 'retweettedBy') {
 			if (!exists) tweet.retweettedBy.push(me);
 		}
 		await tweet.save();
-		return res.status(200).json({ tweet });
+		return res.status(200).json({ updated: tweet[path] });
 	}
 
 	async searchTweets(req, res) {
 		const searchQuery = req.body.query;
-		const result = await Tweet.find({ body: { $regex: searchQuery, $options: 'i' } }).populate(
-			'user',
-		);
+		const result = await Tweet.find({ body: { $regex: searchQuery, $options: 'i' } });
+		// .populate(
+		// 	'user',
+		// );
 		res.status(200).json({ result });
 	}
 }

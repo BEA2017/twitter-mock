@@ -28,16 +28,20 @@ export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
 	});
 	return {
 		...response.data.tweet,
-		retweetBody: tweet.retweetBody,
-		replies: tweet.replies,
-		user: tweet.me,
+		_user: tweet.me.login,
 	};
 });
 
-export const tweets_update = createAsyncThunk('tweets/update', async ({ id, path }) => {
+export const tweets_update = createAsyncThunk('tweets/update', async ({ id, path, me }) => {
 	console.log('tweetsSlice/tweets_update', { id, path });
 	const response = await axios.patch('/tweet', { id, path });
-	return response.data.tweet;
+	return { id, path, updated: response.data.updated, me };
+});
+
+export const tweets_search = createAsyncThunk('tweets/search', async (query) => {
+	console.log('tweetsSlice/tweets_search');
+	const response = await axios.post('/search', { query });
+	return { result: response.data.result };
 });
 
 const tweetsSlice = createSlice({
@@ -46,13 +50,13 @@ const tweetsSlice = createSlice({
 		cache: {
 			//stack: [{path:"", offset},{...}]
 			// profiles: {
-			// 	username1: {
+			// 	/username1: {
 			// 		FEED: [tweetId1, tweetId2, ...],
 			// 		TWEETS: [],
 			// 		TWEETS_AND_REPLIES: [],
 			// 		LIKES: []
 			// 	},
-			// 	username2: {..}
+			// 	/username2: {..}
 			// }
 			//selectedTweets: {id1: {tree: [], replies:[]}, id2: {...}, ...}
 			statck: [],
@@ -62,15 +66,24 @@ const tweetsSlice = createSlice({
 		tweets: {
 			//id1: {...}, id2: {...}
 		},
+		searchResults: [
+			//tweetId1, tweetId2...
+		],
 		state: 'NEVER',
 	},
-	reducers: {},
+	reducers: {
+		clear_search_results: (state, action) => {
+			state.searchResults = [];
+			state.state = 'PENDING';
+		},
+	},
 	extraReducers(builder) {
 		builder
 			.addCase(tweets_download.pending, (state, action) => {
 				state.state = 'LOADING';
 			})
 			.addCase(tweets_download.fulfilled, (state, action) => {
+				console.log('tweetsSlice/tweets_download', action.payload);
 				state.state = 'LOADED';
 				const newTweets = {};
 				action.payload.tweets.forEach((t) => (newTweets[t._id] = t));
@@ -114,26 +127,63 @@ const tweetsSlice = createSlice({
 				};
 			})
 			.addCase(tweet_add.fulfilled, (state, action) => {
-				if (action.payload.parentTweet) {
-					state.tweets = state.tweets.map((t) =>
-						t._id == action.payload.parentTweet
-							? (t = { ...t, replies: [{ ...action.payload }, ...t.replies] })
-							: t,
-					);
+				console.log('tweetsSlice/tweet_add', action.payload);
+				const username = action.payload._user;
+				const tweet = action.payload;
+				delete tweet['_user'];
+				state.tweets = { ...state.tweets, [tweet._id]: { ...tweet, replies: [] } };
+				state.cache.profiles[`/${username}`] &&
+					[
+						tweet.type !== 'Reply' && 'FEED',
+						tweet.type !== 'Reply' && 'TWEETS',
+						'TWEETS_AND_REPLIES',
+					].forEach((path) => {
+						state.cache.profiles[`/${username}`][path]?.unshift(tweet._id);
+					});
+				if (tweet.parentTweet) {
+					state.tweets[tweet.parentTweet]?.replies?.unshift(tweet._id);
+					state.cache.selectedTweets[tweet.parentTweet]?.replies?.unshift(tweet._id);
 				}
-				state.tweets = [{ ...action.payload }, ...state.tweets];
 				socket.emit('new tweet', action.payload.user._id);
 			})
 			.addCase(tweets_update.fulfilled, (state, action) => {
-				const tweet = action.payload;
-				state.tweets = state.tweets.map((t) =>
-					t._id === tweet._id
-						? { ...t, retweettedBy: tweet.retweettedBy, likedBy: tweet.likedBy }
-						: t,
-				);
-				socket.emit('new tweet', action.payload.user._id);
+				const id = action.payload.id;
+				const path = action.payload.path;
+				const updated = action.payload.updated;
+				const me = action.payload.me;
+				state.tweets[id] = {
+					...state.tweets[id],
+					[path]: updated,
+				};
+				if (path === 'likedBy') {
+					const existed = updated.find((id) => id === me._id);
+					if (state.cache.profiles[`/${me.login}`]?.LIKES) {
+						if (!existed) {
+							state.cache.profiles[`/${me.login}`].LIKES = state.cache.profiles[
+								`/${me.login}`
+							].LIKES?.filter((like) => like !== id);
+						} else {
+							state.cache.profiles[`/${me.login}`].LIKES?.unshift(id);
+						}
+					}
+				}
+				// socket.emit('new tweet', action.payload.user._id);
+			})
+			.addCase(tweets_search.pending, (state, action) => {
+				state.state = 'LOADING';
+			})
+			.addCase(tweets_search.fulfilled, (state, action) => {
+				state.state = 'LOADED';
+				console.log('tweetsSlice/tweetsSearch_fulfilled');
+
+				const newTweets = {};
+				action.payload.result.forEach((t) => (newTweets[t._id] = t));
+				state.tweets = { ...state.tweets, ...newTweets };
+
+				state.searchResults = action.payload.result.map((tweet) => tweet._id);
 			});
 	},
 });
 
+export const { clear_search_results } = tweetsSlice.actions;
 export default tweetsSlice.reducer;

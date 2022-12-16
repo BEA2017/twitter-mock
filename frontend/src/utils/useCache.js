@@ -27,10 +27,16 @@ const useCache = (username, requestType, tweetId) => {
 				  })
 				: (data = undefined);
 			return data;
+		} else if (requestType === 'SEARCH') {
+			const searchResults = [];
+			state.tweets.searchResults.forEach((res) => searchResults.push(state.tweets.tweets[res]));
+			return searchResults.length > 0 ? searchResults : undefined;
 		} else {
 			return tweetIds?.map((id) => state.tweets.tweets[id]);
 		}
 	});
+
+	console.log('useCache');
 
 	return cached;
 };

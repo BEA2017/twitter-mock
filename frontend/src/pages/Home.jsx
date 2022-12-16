@@ -4,17 +4,20 @@ import NewTweet from '../components/Tweets/NewTweet';
 import { Modal } from '../components/Utils/Modal';
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../components/Layout/Navbar';
 import Logo from '../components/Layout/Logo';
+import { clear_search_results } from '../store/tweetsSlice';
 
 const Home = () => {
 	const [newTweetModal, setNewTweetModal] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
 	const handleSearch = () => {
 		setSearchQuery('');
+		dispatch(clear_search_results());
 		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
 	};
 

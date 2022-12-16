@@ -29,15 +29,17 @@ const TweetsList = ({ user, request }) => {
 		if (tweets.length === 0) {
 			return request.type === 'FEED' ? <EmptyProfile /> : <EmptyTweetList />;
 		} else {
-			return tweets
-				.filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
-				.map((t, idx) => {
-					return t.type === 'Retweet' ? (
-						<Retweet key={idx} tweet={t} />
-					) : (
-						<Tweet key={idx} tweet={t} />
-					);
-				});
+			return (
+				tweets
+					// .filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
+					.map((t, idx) => {
+						return t.type === 'Retweet' ? (
+							<Retweet key={idx} tweet={t} />
+						) : (
+							<Tweet key={idx} tweet={t} />
+						);
+					})
+			);
 		}
 	};
 

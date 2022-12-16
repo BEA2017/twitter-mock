@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { tweets_download, tweet_by_id } from '../store/tweetsSlice';
+import { tweets_download, tweets_search, tweet_by_id } from '../store/tweetsSlice';
 import { getUsers, set_users_state } from '../store/userSlice';
 import useCache from './useCache';
 
@@ -19,6 +19,8 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 
 	const dispatch = useDispatch();
 
+	console.log('useTweetsLoader');
+
 	useEffect(() => {
 		if (tweetsLoading !== 'LOADED' || usersLoading !== 'LOADED') {
 			setState('LOADING');
@@ -32,19 +34,22 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 			dispatch(set_users_state('PENDING'));
 			request.type === 'TWEET'
 				? dispatch(tweet_by_id(tweetId))
+				: request.type === 'SEARCH'
+				? dispatch(tweets_search(request.searchQuery))
 				: dispatch(tweets_download({ user, request }));
 		}
 	});
 
 	useEffect(() => {
 		const ids = new Set();
+		console.log('useTweetsLoader/tweets', tweets);
 		if (tweetsLoading === 'LOADED' && tweets && request.type !== 'TWEET') {
 			tweets.forEach((t) => {
 				if (!users[t.user]) {
 					ids.add(t.user);
 				}
-				if (t.retweetBody && !users[t.retweetBody.user._id]) {
-					ids.add(t.retweetBody.user._id);
+				if (t.retweetBody && !users[tweets.find((_t) => _t._id === t.retweetBody)?.user]) {
+					ids.add(tweets.find((_t) => _t._id === t.retweetBody)?.user);
 				}
 			});
 		}

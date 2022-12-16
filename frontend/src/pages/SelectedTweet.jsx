@@ -2,13 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Tweet from '../components/Tweets/Tweet';
-import {
-	HeartOutlined,
-	MessageOutlined,
-	PaperClipOutlined,
-	ToTopOutlined,
-	UserOutlined,
-} from '@ant-design/icons';
 import BackButton from '../components/Utils/BackButton';
 import { Avatar } from '../components/Profile/Avatar';
 import NewTweet from '../components/Tweets/NewTweet';
@@ -16,21 +9,20 @@ import axios from 'axios';
 import Spinner from '../components/Layout/Spinner';
 import { tweet_by_id } from '../store/tweetsSlice';
 import useTweetsLoader from '../utils/useTweetsLoader';
+import TweetControllers from '../components/Tweets/TweetControllers';
+import { Modal } from '../components/Utils/Modal';
 
 const SelectedTweet = () => {
 	const { id } = useParams();
+	const me = useSelector((state) => state.users.me);
 	const { tweets, state } = useTweetsLoader({ request: { type: 'TWEET' }, tweetId: id });
 	const users = useSelector((state) => state.users.users);
+	const [showModal, setShowModal] = useState(false);
 
-	// useEffect(() => {
-	// 	dispatch(tweet_by_id(id));
-	// 	setIsInitialized(false);
-	// 	axios.get(`/tweet?id=${id}`).then((res) => {
-	// 		console.log('SelectedTweet/useEffect', res.data);
-	// 		setTweet(res.data);
-	// 		setIsInitialized(true);
-	// 	});
-	// }, [id]);
+	const onClickReply = (e) => {
+		e.preventDefault();
+		setShowModal((prev) => !prev);
+	};
 
 	if (!tweets || state !== 'LOADED') return <Spinner />;
 
@@ -66,17 +58,18 @@ const SelectedTweet = () => {
 					<div className="selected-tweet_date">
 						<span>{new Date(tweets.tweet.createdAt).toLocaleString()}</span>
 					</div>
-					<div className="tweet_controllers">
-						<MessageOutlined className="icon" />
-						<PaperClipOutlined className="icon" />
-						<HeartOutlined className="icon" />
-						<ToTopOutlined className="icon" />
-					</div>
+					<TweetControllers tweet={tweets.tweet} cb={onClickReply} me={me} />
 				</div>
 			</div>
-			<div className="selected-tweet_new-reply">
-				<NewTweet parentTweet={tweets.tweet._id} />
-			</div>
+			{showModal && (
+				<Modal cancel={() => setShowModal(false)}>
+					<NewTweet
+						parentTweet={tweets.tweet._id}
+						input={`@${users[tweets.tweet.user].login}, `}
+						cb={() => setShowModal((prev) => !prev)}
+					/>
+				</Modal>
+			)}
 			<div className="selected-tweet_replies">
 				{tweets.replies.map((r, idx) => {
 					return <Tweet key={idx} tweet={r} />;

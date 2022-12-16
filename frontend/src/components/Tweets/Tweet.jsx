@@ -1,10 +1,4 @@
-import {
-	HeartOutlined,
-	MessageOutlined,
-	PaperClipOutlined,
-	ToTopOutlined,
-	UserOutlined,
-} from '@ant-design/icons';
+import { PaperClipOutlined } from '@ant-design/icons';
 import '../../App.scss';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
@@ -17,6 +11,7 @@ import { tweets_update, tweet_add } from '../../store/tweetsSlice';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { getUserById } from '../../store/userSlice';
+import TweetControllers from './TweetControllers';
 
 const bodyFormatter = (body, query) => {
 	const matchIndexes = [];
@@ -28,10 +23,12 @@ const bodyFormatter = (body, query) => {
 
 	let formattedTweetBody = [];
 	let prev = 0;
-	matchIndexes.forEach((i) => {
+	matchIndexes.forEach((i, idx) => {
 		formattedTweetBody.push(body.slice(prev, i));
 		formattedTweetBody.push(
-			<span className="body_query-result">{body.slice(i, i + query.length)}</span>,
+			<span key={idx} className="body_query-result">
+				{body.slice(i, i + query.length)}
+			</span>,
 		);
 		prev = i + query.length;
 	});
@@ -44,8 +41,8 @@ const bodyFormatter = (body, query) => {
 export const Retweet = ({ tweet }) => {
 	const me = useSelector((state) => state.users.me);
 	const retwittedBy = useSelector((state) => state.users.users[tweet.user]);
-	const quotedAuthor = useSelector((state) => state.users.users[tweet.retweetBody.user._id]);
-	const [isMe, setIsMe] = useState(me._id === quotedAuthor);
+	const retwittedMessage = useSelector((state) => state.tweets.tweets[tweet.retweetBody]);
+	const [isMe, setIsMe] = useState(me._id === tweet.user);
 
 	return (
 		<div className="retweet_container">
@@ -55,7 +52,7 @@ export const Retweet = ({ tweet }) => {
 					{isMe ? <span>Вы ретвитнули</span> : <span>{retwittedBy.login} ретвитнул(а)</span>}
 				</div>
 			</div>
-			<Tweet tweet={{ ...tweet.retweetBody, user: quotedAuthor._id }} />
+			<Tweet tweet={{ ...retwittedMessage }} />
 		</div>
 	);
 };
@@ -69,17 +66,6 @@ const Tweet = ({ tweet, query }) => {
 	const onClickReply = (e) => {
 		e.preventDefault();
 		setShowReply((prev) => !prev);
-	};
-
-	const onClickRetweet = async (e) => {
-		e.preventDefault();
-		dispatch(tweet_add({ retweetId: tweet._id, retweetBody: tweet, me, type: 'Retweet' }));
-		dispatch(tweets_update({ id: tweet._id, path: 'retweet' }));
-	};
-
-	const onClickLike = async (e) => {
-		e.preventDefault();
-		dispatch(tweets_update({ id: tweet._id, path: 'like' }));
 	};
 
 	return (
@@ -106,29 +92,7 @@ const Tweet = ({ tweet, query }) => {
 								{tweet.attachment && <img src={`/images/${tweet.attachment}`} />}
 							</div>
 						</div>
-						<div className="tweet_controllers">
-							<div className="controller">
-								<MessageOutlined className="icon" onClick={onClickReply} />{' '}
-								<span className="controller_info">
-									{tweet.replies && tweet.replies.length > 0 && tweet.replies.length}
-								</span>
-							</div>
-							<div className="controller">
-								<PaperClipOutlined className="icon" onClick={onClickRetweet} />
-								<span className="controller_info">
-									{tweet.retweettedBy && tweet.retweettedBy.length > 0 && tweet.retweettedBy.length}
-								</span>
-							</div>
-							<div className="controller">
-								<HeartOutlined className="icon" onClick={onClickLike} />
-								<span className="controller_info">
-									{tweet.likedBy && tweet.likedBy.length > 0 && tweet.likedBy.length}
-								</span>
-							</div>
-							<div className="controller">
-								<ToTopOutlined className="icon" />
-							</div>
-						</div>
+						<TweetControllers tweet={tweet} cb={onClickReply} me={me} />
 					</NavLink>
 				</div>
 			</div>
