@@ -1,25 +1,16 @@
-import { SearchOutlined, TwitterOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import '../App.scss';
 import NewTweet from '../components/Tweets/NewTweet';
 import { Modal } from '../components/Utils/Modal';
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Logo from '../components/Layout/Logo';
-import { clear_search_results } from '../store/tweetsSlice';
+import useSearch from '../utils/useSearch';
 
 const Home = () => {
 	const [newTweetModal, setNewTweetModal] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
-
-	const handleSearch = () => {
-		setSearchQuery('');
-		dispatch(clear_search_results());
-		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-	};
+	const { handleSearch, searchQuery, onChangeInput } = useSearch();
 
 	return (
 		<div className="home_container">
@@ -32,7 +23,7 @@ const Home = () => {
 			</div>
 			{newTweetModal && (
 				<Modal cancel={() => setNewTweetModal(false)}>
-					<NewTweet />
+					<NewTweet cb={() => setNewTweetModal((prev) => !prev)} />
 				</Modal>
 			)}
 			<div className="home_content">
@@ -45,7 +36,7 @@ const Home = () => {
 						className={'right-sidebar_search'}
 						placeholder={'Поиск по твиттеру'}
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+						onChange={onChangeInput}
 					/>
 					<SearchOutlined onClick={handleSearch} className="right-sidebar_search-icon" />
 				</div>

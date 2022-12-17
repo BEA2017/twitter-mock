@@ -1,10 +1,9 @@
-import { CommentOutlined, SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useSearchParams } from 'react-router-dom';
-import { Avatar, AvatarSmall } from '../components/Profile/Avatar';
 import ContactsCarousel from '../components/Messenger/ContactsCarousel';
 import Logo from '../components/Layout/Logo';
 import Navbar from '../components/Layout/Navbar';

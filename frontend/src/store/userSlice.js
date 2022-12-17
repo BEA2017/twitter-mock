@@ -51,6 +51,7 @@ const userSlice = createSlice({
 				state.state = 'LOADING';
 			})
 			.addCase(getUsers.fulfilled, (state, action) => {
+				console.log('usersSlice/getUsers_fulfilled', action.payload);
 				const newUsers = { ...state.users };
 				action.payload.forEach((u) => {
 					newUsers[u._id] = u;

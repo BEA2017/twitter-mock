@@ -6,11 +6,7 @@ import NewTweet from './NewTweet';
 import { dateFormatter } from '../../utils/dateFormatter';
 import { Avatar } from '../Profile/Avatar';
 import WithNavLink from '../../utils/WithNavLink';
-import { useDispatch, useSelector } from 'react-redux';
-import { tweets_update, tweet_add } from '../../store/tweetsSlice';
-import { useEffect } from 'react';
-import axios from 'axios';
-import { getUserById } from '../../store/userSlice';
+import { useSelector } from 'react-redux';
 import TweetControllers from './TweetControllers';
 
 const bodyFormatter = (body, query) => {
@@ -61,7 +57,6 @@ const Tweet = ({ tweet, query }) => {
 	const [showReply, setShowReply] = useState(false);
 	const me = useSelector((state) => state.users.me);
 	const author = useSelector((state) => state.users.users[tweet.user]);
-	const dispatch = useDispatch();
 
 	const onClickReply = (e) => {
 		e.preventDefault();

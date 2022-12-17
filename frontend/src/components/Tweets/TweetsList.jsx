@@ -1,11 +1,8 @@
-import NewTweet from './NewTweet';
 import Spinner from '../Layout/Spinner';
 import Tweet, { Retweet } from './Tweet';
-import { useEffect } from 'react';
 import { tweets_download } from '../../store/tweetsSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { socket } from '../../store/sockets';
-import { getUsers } from '../../store/userSlice';
 import useTweetsLoader from '../../utils/useTweetsLoader';
 import EmptyProfile from '../Profile/EmptyProfile';
 import EmptyTweetList from './EmptyTweetList';
@@ -29,17 +26,13 @@ const TweetsList = ({ user, request }) => {
 		if (tweets.length === 0) {
 			return request.type === 'FEED' ? <EmptyProfile /> : <EmptyTweetList />;
 		} else {
-			return (
-				tweets
-					// .filter((t) => t.type === 'Tweet' || t.type === 'Retweet')
-					.map((t, idx) => {
-						return t.type === 'Retweet' ? (
-							<Retweet key={idx} tweet={t} />
-						) : (
-							<Tweet key={idx} tweet={t} />
-						);
-					})
-			);
+			return tweets.map((t, idx) => {
+				return t.type === 'Retweet' ? (
+					<Retweet key={idx} tweet={t} />
+				) : (
+					<Tweet key={idx} tweet={t} />
+				);
+			});
 		}
 	};
 

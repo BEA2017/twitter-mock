@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Tweet from '../components/Tweets/Tweet';
 import BackButton from '../components/Utils/BackButton';
 import { Avatar } from '../components/Profile/Avatar';
 import NewTweet from '../components/Tweets/NewTweet';
-import axios from 'axios';
 import Spinner from '../components/Layout/Spinner';
-import { tweet_by_id } from '../store/tweetsSlice';
 import useTweetsLoader from '../utils/useTweetsLoader';
 import TweetControllers from '../components/Tweets/TweetControllers';
 import { Modal } from '../components/Utils/Modal';
@@ -58,7 +56,11 @@ const SelectedTweet = () => {
 					<div className="selected-tweet_date">
 						<span>{new Date(tweets.tweet.createdAt).toLocaleString()}</span>
 					</div>
-					<TweetControllers tweet={tweets.tweet} cb={onClickReply} me={me} />
+					<TweetControllers
+						tweet={{ ...tweets.tweet, replies: tweets.replies }}
+						cb={onClickReply}
+						me={me}
+					/>
 				</div>
 			</div>
 			{showModal && (

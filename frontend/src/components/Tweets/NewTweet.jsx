@@ -3,7 +3,6 @@ import { FileImageOutlined, SmileOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { tweet_add } from '../../store/tweetsSlice';
-import Profile from '../../pages/Profile';
 import { Avatar } from '../Profile/Avatar';
 import { createRef } from 'react';
 import axios from 'axios';

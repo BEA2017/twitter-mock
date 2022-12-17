@@ -9,7 +9,7 @@ export const tweets_download = createAsyncThunk('tweets/download', async ({ user
 		requestType: request.type,
 		userId: user._id,
 	});
-	return { user, request, tweets: response.data.tweets };
+	return { user, request, tweets: response.data.tweets, retwitted: response.data.retwitted };
 });
 
 export const tweet_by_id = createAsyncThunk('tweets/tweetById', async (id) => {
@@ -26,9 +26,11 @@ export const tweet_add = createAsyncThunk('tweets/add', async (tweet) => {
 		attachment: tweet.attachment,
 		type: tweet.type,
 	});
+	const retwittedUser = tweet.type === 'Retweet' ? tweet.retweetBody.user : undefined;
 	return {
 		...response.data.tweet,
 		_user: tweet.me.login,
+		retwittedUser,
 	};
 });
 
@@ -85,18 +87,23 @@ const tweetsSlice = createSlice({
 			.addCase(tweets_download.fulfilled, (state, action) => {
 				console.log('tweetsSlice/tweets_download', action.payload);
 				state.state = 'LOADED';
-				const newTweets = {};
-				action.payload.tweets.forEach((t) => (newTweets[t._id] = t));
-				state.tweets = { ...state.tweets, ...newTweets };
+				const tweets = action.payload.tweets;
+				const retwitted = action.payload.retwitted;
+				const tweetsWithRetweets = {};
+				tweets.concat(...retwitted).forEach((t) => (tweetsWithRetweets[t._id] = t));
+				state.tweets = { ...state.tweets, ...tweetsWithRetweets };
 
 				const path = action.payload.request.path;
 				const username = path;
+
+				const queryTweets = {};
+				tweets.forEach((t) => (queryTweets[t._id] = t));
 
 				state.cache.profiles = {
 					...state.cache.profiles,
 					[username]: {
 						...state.cache.profiles[username],
-						[action.payload.request.type]: Object.keys(newTweets),
+						[action.payload.request.type]: Object.keys(queryTweets),
 					},
 				};
 			})
@@ -104,16 +111,20 @@ const tweetsSlice = createSlice({
 				state.state = 'LOADING';
 			})
 			.addCase(tweet_by_id.fulfilled, (state, action) => {
+				console.log('tweetsSlice/tweet_by_id: fulfilled', action.payload);
 				state.state = 'LOADED';
 				const newTweets = {};
 
 				[action.payload.tweet.tree, action.payload.tweet.replies].forEach((payload) => {
-					payload?.forEach((p) => {
+					payload.forEach((p) => {
 						newTweets[p._id] = p;
 					});
 				});
 
-				newTweets[action.payload.id] = action.payload.tweet.tweet;
+				newTweets[action.payload.id] = {
+					...action.payload.tweet.tweet,
+					replies: action.payload.tweet.replies,
+				};
 
 				state.tweets = { ...state.tweets, ...newTweets };
 
@@ -141,8 +152,19 @@ const tweetsSlice = createSlice({
 						state.cache.profiles[`/${username}`][path]?.unshift(tweet._id);
 					});
 				if (tweet.parentTweet) {
-					state.tweets[tweet.parentTweet]?.replies?.unshift(tweet._id);
+					state.tweets[tweet.parentTweet]?.replies.unshift(tweet._id);
 					state.cache.selectedTweets[tweet.parentTweet]?.replies?.unshift(tweet._id);
+				}
+				if (tweet.type === 'Retweet') {
+					state.tweets[tweet._id] = {
+						...state.tweets[tweet._id],
+						retwittedUser: action.payload.retwittedUser,
+					};
+					const test = {
+						...state.tweets[tweet._id],
+						retwittedUser: action.payload.retwittedUser,
+					};
+					console.log('tweetsSlice/tweet_add:fulfilled', test);
 				}
 				socket.emit('new tweet', action.payload.user._id);
 			})

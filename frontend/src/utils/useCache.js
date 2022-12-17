@@ -17,7 +17,7 @@ const useCache = (username, requestType, tweetId) => {
 			let data;
 			selectedTweet
 				? (data = {
-						tweet: state.tweets.tweets[selectedTweet?.tweet],
+						tweet: state.tweets.tweets[selectedTweet.tweet],
 						tree: selectedTweet?.tree.map((t) => {
 							return state.tweets.tweets[t];
 						}),
@@ -26,6 +26,7 @@ const useCache = (username, requestType, tweetId) => {
 						}),
 				  })
 				: (data = undefined);
+			// console.log('useCache/selectedTweet_data', data);
 			return data;
 		} else if (requestType === 'SEARCH') {
 			const searchResults = [];
@@ -36,7 +37,7 @@ const useCache = (username, requestType, tweetId) => {
 		}
 	});
 
-	console.log('useCache');
+	// console.log('useCache');
 
 	return cached;
 };

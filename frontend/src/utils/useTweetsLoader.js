@@ -19,7 +19,7 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 
 	const dispatch = useDispatch();
 
-	console.log('useTweetsLoader');
+	// console.log('useTweetsLoader');
 
 	useEffect(() => {
 		if (tweetsLoading !== 'LOADED' || usersLoading !== 'LOADED') {
@@ -42,14 +42,14 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 
 	useEffect(() => {
 		const ids = new Set();
-		console.log('useTweetsLoader/tweets', tweets);
+		// console.log('useTweetsLoader/tweets', tweets);
 		if (tweetsLoading === 'LOADED' && tweets && request.type !== 'TWEET') {
 			tweets.forEach((t) => {
 				if (!users[t.user]) {
 					ids.add(t.user);
 				}
-				if (t.retweetBody && !users[tweets.find((_t) => _t._id === t.retweetBody)?.user]) {
-					ids.add(tweets.find((_t) => _t._id === t.retweetBody)?.user);
+				if (t.retweetBody && !users[t.retwittedUser]) {
+					ids.add(t.retwittedUser);
 				}
 			});
 		}
@@ -65,6 +65,7 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 				}
 			});
 		}
+
 		ids.size === 0 ? dispatch(set_users_state('LOADED')) : dispatch(getUsers([...ids.values()]));
 	}, [tweetsLoading]);
 
