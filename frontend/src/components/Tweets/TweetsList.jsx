@@ -23,9 +23,7 @@ const TweetsList = ({ user, request }) => {
 		});
 
 	const renderTweetList = (tweets) => {
-		if (tweets.length === 0) {
-			return request.type === 'FEED' ? <EmptyProfile /> : <EmptyTweetList />;
-		} else {
+		if (tweets) {
 			return tweets.map((t, idx) => {
 				return t.type === 'Retweet' ? (
 					<Retweet key={idx} tweet={t} />
@@ -33,16 +31,24 @@ const TweetsList = ({ user, request }) => {
 					<Tweet key={idx} tweet={t} />
 				);
 			});
+		} else {
+			return <Spinner />;
 		}
 	};
 
 	return (
 		<>
 			<main className="list">
-				{state === 'LOADING' ? (
+				{['LOADING', 'NEVER'].some((s) => state === s) ? (
 					<Spinner />
-				) : state === 'LOADED' && tweets ? (
+				) : state === 'LOADED' ? (
 					renderTweetList(tweets)
+				) : state === 'EMPTY' ? (
+					request.type === 'FEED' ? (
+						<EmptyProfile />
+					) : (
+						<EmptyTweetList />
+					)
 				) : (
 					<>Something went wrong</>
 				)}

@@ -107,10 +107,35 @@ class TweetController {
 	}
 
 	async searchTweets(req, res) {
-		const searchQuery = req.body.query;
-		const result = await Tweet.find({ body: { $regex: searchQuery, $options: 'i' } });
+		const searchQuery = req.body.searchQuery;
+		const searchType = req.body.searchType;
 
-		res.status(200).json({ result });
+		const query = {
+			TOP: { body: { $regex: searchQuery, $options: 'i' } },
+			LAST: { body: { $regex: searchQuery, $options: 'i' } },
+			PEOPLE: {},
+			IMAGES: {
+				body: { $regex: searchQuery, $options: 'i' },
+				attachment: { $ne: '' },
+			},
+			VIDEO: {},
+		};
+
+		let result = await Tweet.find(query[searchType]);
+
+		result = await Promise.all(
+			result.map(async (r) => {
+				const replies = await Tweet.find(
+					{
+						parentTweet: r._id,
+					},
+					'_id',
+				);
+				return r._doc ? { ...r._doc, replies } : { ...r, replies };
+			}),
+		);
+
+		return res.status(200).json({ result });
 	}
 }
 

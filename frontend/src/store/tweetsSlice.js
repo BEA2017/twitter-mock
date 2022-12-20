@@ -3,7 +3,7 @@ import axios from 'axios';
 import { socket } from './sockets';
 
 export const tweets_download = createAsyncThunk('tweets/download', async ({ user, request }) => {
-	console.log('tweetsSlice/tweets_download');
+	// console.log('tweetsSlice/tweets_download');
 	const response = await axios.post('/tweets', {
 		subscriptionIds: [user._id, ...user.subscriptions.map((s) => s._id)],
 		requestType: request.type,
@@ -13,7 +13,7 @@ export const tweets_download = createAsyncThunk('tweets/download', async ({ user
 });
 
 export const tweet_by_id = createAsyncThunk('tweets/tweetById', async (id) => {
-	console.log('tweetsSlice/tweet_by_id');
+	// console.log('tweetsSlice/tweet_by_id');
 	const response = await axios.get(`/tweet?id=${id}`);
 	return { id, tweet: response.data };
 });
@@ -40,11 +40,14 @@ export const tweets_update = createAsyncThunk('tweets/update', async ({ id, path
 	return { id, path, updated: response.data.updated, me };
 });
 
-export const tweets_search = createAsyncThunk('tweets/search', async (query) => {
-	console.log('tweetsSlice/tweets_search');
-	const response = await axios.post('/search', { query });
-	return { result: response.data.result };
-});
+export const tweets_search = createAsyncThunk(
+	'tweets/search',
+	async ({ searchQuery, searchType }) => {
+		console.log('tweetsSlice/tweets_search');
+		const response = await axios.post('/search', { searchQuery, searchType });
+		return { result: response.data.result };
+	},
+);
 
 const tweetsSlice = createSlice({
 	name: 'tweetsState',
@@ -74,6 +77,9 @@ const tweetsSlice = createSlice({
 		state: 'NEVER',
 	},
 	reducers: {
+		set_tweets_state: (state, action) => {
+			state.state = action.payload;
+		},
 		clear_search_results: (state, action) => {
 			state.searchResults = [];
 			state.state = 'PENDING';
@@ -85,7 +91,7 @@ const tweetsSlice = createSlice({
 				state.state = 'LOADING';
 			})
 			.addCase(tweets_download.fulfilled, (state, action) => {
-				console.log('tweetsSlice/tweets_download', action.payload);
+				// console.log('tweetsSlice/tweets_download', action.payload);
 				state.state = 'LOADED';
 				const tweets = action.payload.tweets;
 				const retwitted = action.payload.retwitted;
@@ -111,7 +117,7 @@ const tweetsSlice = createSlice({
 				state.state = 'LOADING';
 			})
 			.addCase(tweet_by_id.fulfilled, (state, action) => {
-				console.log('tweetsSlice/tweet_by_id: fulfilled', action.payload);
+				// console.log('tweetsSlice/tweet_by_id: fulfilled', action.payload);
 				state.state = 'LOADED';
 				const newTweets = {};
 
@@ -173,6 +179,7 @@ const tweetsSlice = createSlice({
 				const path = action.payload.path;
 				const updated = action.payload.updated;
 				const me = action.payload.me;
+				// state.state = 'UPDATED';
 				state.tweets[id] = {
 					...state.tweets[id],
 					[path]: updated,
@@ -207,5 +214,5 @@ const tweetsSlice = createSlice({
 	},
 });
 
-export const { clear_search_results } = tweetsSlice.actions;
+export const { set_tweets_state, clear_search_results } = tweetsSlice.actions;
 export default tweetsSlice.reducer;

@@ -1,24 +1,28 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { clear_search_results } from '../store/tweetsSlice';
+import useTweetsLoader from './useTweetsLoader';
 
-const useSearch = () => {
+const useSearch = (request, cb) => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const [searchQuery, setSearchQuery] = useState('');
+	const { tweets, state, startLoading } = useTweetsLoader({
+		request: {
+			type: 'SEARCH',
+			searchQuery: request.queryText,
+			searchType: request.queryType,
+		},
+	});
 
-	const handleSearch = () => {
-		setSearchQuery('');
+	const handleSearch = useCallback(() => {
+		startLoading();
 		dispatch(clear_search_results());
-		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-	};
+		navigate(`/search?q=${encodeURIComponent(request.queryText)}`);
+		cb && cb();
+	}, [request.queryText]);
 
-	const onChangeInput = (e) => {
-		setSearchQuery(e.target.value);
-	};
-
-	return { searchQuery, handleSearch, onChangeInput };
+	return { handleSearch, tweets, state, startLoading };
 };
 
 export default useSearch;

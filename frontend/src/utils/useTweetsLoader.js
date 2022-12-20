@@ -5,71 +5,122 @@ import { getUsers, set_users_state } from '../store/userSlice';
 import useCache from './useCache';
 
 //request{
-//	type: FEED | TWEET | TWEETS | TWEETS_AND_REPLIES | LIKES,
-//  path
-//	sender,
-//	tweetId
+//	type: FEED | TWEET | TWEETS | TWEETS_AND_REPLIES | LIKES | SEARCH,
+//  (only for profile group requests)
+//    path: /login
+// 	(only for search requests):
+//	  searchQuery
+//	  searchType: TOP | LAST | PEOPLE | IMAGES | VIDEO
+//  (only for selected tweet type of requests)
+//    tweetId
 //}
 const useTweetsLoader = ({ user, request, tweetId }) => {
 	const tweetsLoading = useSelector((state) => state.tweets.state);
 	const usersLoading = useSelector((state) => state.users.state);
-	const tweets = useCache(user?.login, request.type, tweetId);
 	const users = useSelector((state) => state.users.users);
-	const [state, setState] = useState('LOADING');
+	const { cached } = useCache(user?.login, request.type, tweetId);
+	const [state, setState] = useState('NEVER');
+	const [mutex, setMutex] = useState(false);
 
 	const dispatch = useDispatch();
 
-	// console.log('useTweetsLoader');
+	const startLoading = () => {
+		setState('LOADING');
+		setMutex(false);
+	};
+
+	const checkCacheIsEmpty = () => {
+		if (request.type === 'TWEET' && !cached) {
+			return true;
+		} else if (request.type !== 'TWEET' && cached.length === 0) {
+			return true;
+		}
+		return false;
+	};
 
 	useEffect(() => {
-		if (tweetsLoading !== 'LOADED' || usersLoading !== 'LOADED') {
-			setState('LOADING');
-		} else {
-			setState('LOADED');
+		console.log('START');
+		startLoading();
+	}, [request.searchType, request.type, user?.login, tweetId]);
+
+	//1. CHECK CACHE AND IF EMPTY SEND INITIAL TWEET REQUEST (RESULTS WILL BE CACHED)
+	useEffect(() => {
+		if (state === 'LOADING' && !mutex) {
+			console.log('CHECK CACHE');
+
+			setMutex(true);
+			dispatch(set_users_state('PENDING'));
+
+			if (checkCacheIsEmpty()) {
+				request.type === 'TWEET'
+					? dispatch(tweet_by_id(tweetId))
+					: request.type === 'SEARCH'
+					? dispatch(tweets_search(request))
+					: dispatch(tweets_download({ user, request }));
+			}
+		}
+	}, [state]);
+
+	//2. CHECK RESULT OF INITIAL TWEET REQUEST. IF EMPTY - TWEETS NOT FOUND
+	useEffect(() => {
+		if (tweetsLoading === 'LOADED' && mutex && checkCacheIsEmpty()) {
+			console.log('RESULT IS EMPTY');
+
+			setState('EMPTY');
+			dispatch(set_users_state('LOADED'));
+		}
+	}, [tweetsLoading]);
+
+	//3. FOR EACH TWEET CHECK IT'S AUTHOR. IF NOT PRESENT IN USERS STORE - MAKE NETWORK CALL
+	useEffect(() => {
+		const ids = new Set();
+		if (!checkCacheIsEmpty() && tweetsLoading === 'LOADED' && usersLoading !== 'LOADING' && mutex) {
+			if (request.type === 'TWEET') {
+				console.log('LOAD USERS');
+
+				const userIds = new Set();
+				[cached.tree, cached.replies].forEach((arr) => {
+					arr.forEach((tw) => userIds.add(tw.user));
+				});
+				userIds.add(cached.tweet.user);
+				userIds.forEach((id) => {
+					if (!users[id]) {
+						ids.add(id);
+					}
+				});
+			} else if (request.type !== 'TWEET') {
+				console.log('LOAD USERS');
+
+				cached.forEach((t) => {
+					if (!users[t.user]) {
+						ids.add(t.user);
+					}
+					if (t.retweetBody && !users[t.retwittedUser]) {
+						ids.add(t.retwittedUser);
+					}
+				});
+			}
+
+			console.log('useTweetsLoader/users loading', ids);
+
+			ids.size === 0 ? dispatch(set_users_state('LOADED')) : dispatch(getUsers([...ids.values()]));
+		}
+	}, [tweetsLoading, usersLoading, cached]);
+
+	//4. EXIT STATE MACHINE
+	useEffect(() => {
+		if ([tweetsLoading, usersLoading].every((state) => state === 'LOADED') && mutex) {
+			checkCacheIsEmpty() ? setState('EMPTY') : setState('LOADED');
+			setMutex(false);
+			console.log('EXIT');
 		}
 	}, [tweetsLoading, usersLoading]);
 
-	useEffect(() => {
-		if (!tweets && tweetsLoading !== 'LOADING') {
-			dispatch(set_users_state('PENDING'));
-			request.type === 'TWEET'
-				? dispatch(tweet_by_id(tweetId))
-				: request.type === 'SEARCH'
-				? dispatch(tweets_search(request.searchQuery))
-				: dispatch(tweets_download({ user, request }));
-		}
-	});
-
-	useEffect(() => {
-		const ids = new Set();
-		// console.log('useTweetsLoader/tweets', tweets);
-		if (tweetsLoading === 'LOADED' && tweets && request.type !== 'TWEET') {
-			tweets.forEach((t) => {
-				if (!users[t.user]) {
-					ids.add(t.user);
-				}
-				if (t.retweetBody && !users[t.retwittedUser]) {
-					ids.add(t.retwittedUser);
-				}
-			});
-		}
-		if (tweetsLoading === 'LOADED' && tweets && request.type === 'TWEET') {
-			const userIds = new Set();
-			[tweets.tree, tweets.replies].forEach((arr) => {
-				arr.forEach((tw) => userIds.add(tw.user));
-			});
-			userIds.add(tweets.tweet.user);
-			userIds.forEach((id) => {
-				if (!users[id]) {
-					ids.add(id);
-				}
-			});
-		}
-
-		ids.size === 0 ? dispatch(set_users_state('LOADED')) : dispatch(getUsers([...ids.values()]));
-	}, [tweetsLoading]);
-
-	return { tweets, users, state };
+	return {
+		tweets: state === 'EMPTY' ? [] : cached,
+		state,
+		startLoading,
+	};
 };
 
 export default useTweetsLoader;

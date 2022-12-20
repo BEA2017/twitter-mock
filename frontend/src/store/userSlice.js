@@ -12,6 +12,7 @@ export const getUserById = createAsyncThunk('users/getUserById', async (id) => {
 });
 
 export const getUsers = createAsyncThunk('users/getUsers', async (ids) => {
+	// console.log('userSlice/getUsers');
 	const response = await axios.post(`/users`, { ids });
 	return response.data.users;
 });
@@ -51,7 +52,7 @@ const userSlice = createSlice({
 				state.state = 'LOADING';
 			})
 			.addCase(getUsers.fulfilled, (state, action) => {
-				console.log('usersSlice/getUsers_fulfilled', action.payload);
+				// console.log('usersSlice/getUsers_fulfilled', action.payload);
 				const newUsers = { ...state.users };
 				action.payload.forEach((u) => {
 					newUsers[u._id] = u;

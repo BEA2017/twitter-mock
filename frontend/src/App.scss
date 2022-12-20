@@ -468,6 +468,68 @@ textarea, input[type="text"],input[type="password"]{
     }
 }
 
+.serach-page_container{
+    .search_sticky{
+
+        position: sticky;
+        top: 0;
+        margin: 0 -0.5em;
+        background: rgba(white,0.85);
+
+        .search_header{
+            display: flex;
+            justify-content: space-evenly;
+            .search_input-container{
+                text-align: center;
+                position: relative;
+    
+                .search_input{
+                    font-size: 1em;
+                    margin: 0.8em;
+                    padding: 0.5em 2.9em 0.5em 1em;
+                    height: 48px;
+                    width: 460px;
+                    border-radius: 30px;
+                }
+    
+                .search_input-icon{
+                    position: absolute;
+                    top: 50%;
+                    transform: translate(-60px,-45%);
+                    cursor: pointer;
+                }
+    
+            }
+    
+            .hidden{
+                width: 30px;
+                height: 30px;
+                padding: 5px;
+            }
+    }
+    }
+
+    .search_controllers{
+        display: flex;
+        justify-content: space-evenly;
+        .search_controllers-item{
+            height: 48px;
+            padding: 0px 20px;
+            cursor: pointer;
+        }
+
+        .search_controllers-item:hover{
+           border-bottom: 5px solid rgb(78, 175, 254);
+        }
+
+        .search_controllers-item-active{
+            border-bottom: 5px solid rgb(78, 175, 254);
+            font-weight: 800;
+         }
+    }
+
+}
+
 .home_new-tweet{
     display: flex;
     margin: 0.8em 1em;
@@ -815,29 +877,6 @@ textarea, input[type="text"],input[type="password"]{
 
         .selected-tweet_date{
             color: rgb(162, 162, 162);
-        }
-    }
-
-}
-
-.test_container{
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    margin: 2em auto;
-    width: 80vw;
-    height: 30vh;
-    border: 1px solid black;
-    border-radius: 30px;
-    overflow-y: scroll;
-
-    .test_body{
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        height: 100%;
-        .test_item{
-            margin: 1em 0.8em;
         }
     }
 

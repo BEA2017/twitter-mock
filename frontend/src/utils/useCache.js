@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 
 const useCache = (username, requestType, tweetId) => {
 	const tweetIds = useSelector((state) => {
+		// console.log('useCache/tweetIds');
 		if (['FEED', 'TWEETS', 'TWEETS_AND_REPLIES', 'LIKES'].includes(requestType)) {
 			return (
 				state.tweets.cache.profiles[`/${username}`] &&
@@ -12,6 +13,7 @@ const useCache = (username, requestType, tweetId) => {
 		}
 	});
 	const cached = useSelector((state) => {
+		// console.log('useCache/cached');
 		if (requestType === 'TWEET') {
 			const selectedTweet = state.tweets.cache.selectedTweets[tweetId];
 			let data;
@@ -31,15 +33,13 @@ const useCache = (username, requestType, tweetId) => {
 		} else if (requestType === 'SEARCH') {
 			const searchResults = [];
 			state.tweets.searchResults.forEach((res) => searchResults.push(state.tweets.tweets[res]));
-			return searchResults.length > 0 ? searchResults : undefined;
+			return searchResults.length > 0 ? searchResults : [];
 		} else {
-			return tweetIds?.map((id) => state.tweets.tweets[id]);
+			return tweetIds?.map((id) => state.tweets.tweets[id]) || [];
 		}
 	});
 
-	// console.log('useCache');
-
-	return cached;
+	return { cached };
 };
 
 export default useCache;
