@@ -5,7 +5,7 @@ import { socket } from './sockets';
 export const tweets_download = createAsyncThunk('tweets/download', async ({ user, request }) => {
 	// console.log('tweetsSlice/tweets_download');
 	const response = await axios.post('/tweets', {
-		subscriptionIds: [user._id, ...user.subscriptions.map((s) => s._id)],
+		subscriptionIds: [user._id, ...user.subscriptions.map((s) => s._id || s)],
 		requestType: request.type,
 		userId: user._id,
 	});
@@ -83,6 +83,11 @@ const tweetsSlice = createSlice({
 		clear_search_results: (state, action) => {
 			state.searchResults = [];
 			state.state = 'PENDING';
+		},
+		refresh_feed: (state, action) => {
+			console.log('tweetsSlice/refresh_feed', action.payload.username);
+			const username = action.payload.username;
+			delete state.cache.profiles[`/${username}`]?.FEED;
 		},
 	},
 	extraReducers(builder) {
@@ -214,5 +219,5 @@ const tweetsSlice = createSlice({
 	},
 });
 
-export const { set_tweets_state, clear_search_results } = tweetsSlice.actions;
+export const { set_tweets_state, clear_search_results, refresh_feed } = tweetsSlice.actions;
 export default tweetsSlice.reducer;

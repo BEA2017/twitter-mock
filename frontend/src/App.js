@@ -33,6 +33,8 @@ function App() {
 
 	if (!isInitialized) return <Spinner />;
 
+	console.log('App/me', loggedUser);
+
 	return (
 		<div className="App">
 			<BrowserRouter>

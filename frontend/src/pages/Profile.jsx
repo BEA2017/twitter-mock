@@ -18,6 +18,7 @@ import axios from 'axios';
 import { updateFollowList } from '../store/userSlice';
 import Spinner from '../components/Layout/Spinner';
 import TweetsList from '../components/Tweets/TweetsList';
+import { refresh_feed } from '../store/tweetsSlice';
 
 const Profile = () => {
 	const login = useParams().profile;
@@ -42,6 +43,11 @@ const Profile = () => {
 		setMenuIndex(idx);
 	};
 
+	const onClickFollow = (type) => {
+		dispatch(updateFollowList({ type, followId: profile._id }));
+		dispatch(refresh_feed({ username: me.login }));
+	};
+
 	const menu = {
 		Твиты: 'TWEETS',
 		'Твиты и ответы': 'TWEETS_AND_REPLIES',
@@ -58,8 +64,7 @@ const Profile = () => {
 				<div
 					className="profile_hero"
 					style={{
-						background:
-							'url("https://pbs.twimg.com/profile_banners/1019169865/1401944529/1500x500")',
+						background: 'url("/images/beatles_header.jpg")',
 						backgroundSize: 'contain',
 					}}>
 					{profile.avatar ? <ProfileAvatar src={`/images/${profile.avatar}`} /> : <ProfileAvatar />}
@@ -71,19 +76,11 @@ const Profile = () => {
 						) : (
 							<div>
 								{me.subscriptions.find((sub) => sub._id === profile._id) ? (
-									<div
-										className="button"
-										onClick={() =>
-											dispatch(updateFollowList({ type: 'unfollow', followId: profile._id }))
-										}>
+									<div className="button" onClick={() => onClickFollow('unfollow')}>
 										<UserDeleteOutlined /> Отписаться
 									</div>
 								) : (
-									<div
-										className="button"
-										onClick={() =>
-											dispatch(updateFollowList({ type: 'follow', followId: profile._id }))
-										}>
+									<div className="button" onClick={() => onClickFollow('follow')}>
 										<UserAddOutlined /> Читать
 									</div>
 								)}

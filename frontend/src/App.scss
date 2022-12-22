@@ -46,6 +46,17 @@ textarea, input[type="text"],input[type="password"]{
     border-radius: 23px;
 }
 
+.button_secondary{
+    color: rgb(4, 142, 255);
+    font-weight: 700;
+    border: 1px solid rgb(4, 142, 255);
+    border-radius: 0.8em;
+}
+
+.button_secondary:hover{
+    background: white;
+}
+
 .icon:hover{
     background: rgb(154, 154, 154);
     border-radius: 50%;
@@ -60,6 +71,12 @@ textarea, input[type="text"],input[type="password"]{
 .body_query-result{
     color: white;
     background: rgb(78, 175, 254);
+}
+
+.hashtag{
+    color: rgb(18, 148, 255);
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .login_page-container{
@@ -638,6 +655,37 @@ textarea, input[type="text"],input[type="password"]{
     justify-content: center;
     align-items: center;
     padding: 5px;
+}
+
+.user_container{
+    display: flex;
+    margin:0.3em 0;
+    font-size: 0.9rem;
+
+    a{
+        display: flex;
+    }
+
+    .user_info{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 0.2em;
+
+        .user_info-name{font-weight: 700;}
+    }
+
+    .user-cta{
+        align-self: center;
+        margin-left: auto;
+    }
+}
+
+.user-list_container{
+    max-height: calc(58px * 5);
+    padding-right: 0.8rem;
+    margin-right: -1.3em;
+    overflow-y: auto;
 }
 
 .profile_container{

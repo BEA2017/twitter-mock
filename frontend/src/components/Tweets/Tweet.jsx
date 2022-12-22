@@ -1,38 +1,39 @@
 import { PaperClipOutlined } from '@ant-design/icons';
 import '../../App.scss';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import NewTweet from './NewTweet';
 import { dateFormatter } from '../../utils/dateFormatter';
 import { Avatar } from '../Profile/Avatar';
 import WithNavLink from '../../utils/WithNavLink';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import TweetControllers from './TweetControllers';
+import { hashtagsFormatter, searchFormatter } from '../../utils/tweetBodyFormatter';
 
-const bodyFormatter = (body, query) => {
-	const matchIndexes = [];
-	let pos = -1;
-	do {
-		pos = body.toLowerCase().indexOf(query.toLowerCase(), pos + 1);
-		pos !== -1 && matchIndexes.push(pos);
-	} while (pos !== -1);
+// const bodyFormatter = (body, query) => {
+// 	const matchIndexes = [];
+// 	let pos = -1;
+// 	do {
+// 		pos = body.toLowerCase().indexOf(query.toLowerCase(), pos + 1);
+// 		pos !== -1 && matchIndexes.push(pos);
+// 	} while (pos !== -1);
 
-	let formattedTweetBody = [];
-	let prev = 0;
-	matchIndexes.forEach((i, idx) => {
-		formattedTweetBody.push(body.slice(prev, i));
-		formattedTweetBody.push(
-			<span key={idx} className="body_query-result">
-				{body.slice(i, i + query.length)}
-			</span>,
-		);
-		prev = i + query.length;
-	});
-	if (matchIndexes.at(-1) + query.length < body.length) {
-		formattedTweetBody.push(body.slice(matchIndexes.at(-1) + query.length, body.length));
-	}
-	return formattedTweetBody;
-};
+// 	let formattedTweetBody = [];
+// 	let prev = 0;
+// 	matchIndexes.forEach((i, idx) => {
+// 		formattedTweetBody.push(body.slice(prev, i));
+// 		formattedTweetBody.push(
+// 			<span key={idx} className="body_query-result">
+// 				{body.slice(i, i + query.length)}
+// 			</span>,
+// 		);
+// 		prev = i + query.length;
+// 	});
+// 	if (matchIndexes.at(-1) + query.length < body.length) {
+// 		formattedTweetBody.push(body.slice(matchIndexes.at(-1) + query.length, body.length));
+// 	}
+// 	return formattedTweetBody;
+// };
 
 export const Retweet = ({ tweet }) => {
 	const me = useSelector((state) => state.users.me);
@@ -56,6 +57,8 @@ export const Retweet = ({ tweet }) => {
 const Tweet = ({ tweet, query }) => {
 	const [showReply, setShowReply] = useState(false);
 	const me = useSelector((state) => state.users.me);
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
 	const author = useSelector((state) => state.users.users[tweet.user]);
 
 	const onClickReply = (e) => {
@@ -82,7 +85,9 @@ const Tweet = ({ tweet, query }) => {
 							&#183; {dateFormatter(new Date(tweet.createdAt))}
 						</span>
 						<div className="tweet_body">
-							{query ? bodyFormatter(tweet.body, query) : tweet.body}
+							{query
+								? searchFormatter(tweet.body, query)
+								: hashtagsFormatter(tweet.body, navigate, dispatch)}
 							<div className="tweet_attachments">
 								{tweet.attachment && <img src={`/images/${tweet.attachment}`} />}
 							</div>

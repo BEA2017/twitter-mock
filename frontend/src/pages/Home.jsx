@@ -8,18 +8,25 @@ import Navbar from '../components/Layout/Navbar';
 import Logo from '../components/Layout/Logo';
 import { useDispatch } from 'react-redux';
 import { clear_search_results } from '../store/tweetsSlice';
+import useRecommendationsLoader from '../utils/useRecommendationsLoader';
+import User from '../components/Profile/User';
+import UserList from '../components/Profile/UserList';
 
 const Home = () => {
 	const [newTweetModal, setNewTweetModal] = useState(false);
+	const [moreUsersModal, setMoreUsersModal] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const { users } = useRecommendationsLoader();
 
 	const onClickSearch = () => {
 		navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
 		dispatch(clear_search_results());
 		setSearchQuery('');
 	};
+
+	const userRecommendations = users.map((u, idx) => <User key={idx} user={u} />);
 
 	return (
 		<div className="home_container">
@@ -51,6 +58,19 @@ const Home = () => {
 				</div>
 				<div className="right-sidebar_recommendations">
 					<h4>Вам может понравиться</h4>
+					{userRecommendations.slice(0, 3)}
+					{users.length > 3 && (
+						<div
+							style={{ textAlign: 'center', fontSize: '0.9rem', cursor: 'pointer' }}
+							onClick={() => setMoreUsersModal(true)}>
+							Показать еще
+						</div>
+					)}
+					{moreUsersModal && (
+						<Modal cancel={() => setMoreUsersModal(false)}>
+							<UserList users={users} />
+						</Modal>
+					)}
 				</div>
 			</div>
 		</div>

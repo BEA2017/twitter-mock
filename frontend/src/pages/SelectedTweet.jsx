@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Tweet from '../components/Tweets/Tweet';
 import BackButton from '../components/Utils/BackButton';
 import { Avatar } from '../components/Profile/Avatar';
@@ -9,6 +9,7 @@ import Spinner from '../components/Layout/Spinner';
 import useTweetsLoader from '../utils/useTweetsLoader';
 import TweetControllers from '../components/Tweets/TweetControllers';
 import { Modal } from '../components/Utils/Modal';
+import { hashtagsFormatter } from '../utils/tweetBodyFormatter';
 
 const SelectedTweet = () => {
 	const { id } = useParams();
@@ -16,6 +17,8 @@ const SelectedTweet = () => {
 	const { tweets, state } = useTweetsLoader({ request: { type: 'TWEET' }, tweetId: id });
 	const users = useSelector((state) => state.users.users);
 	const [showModal, setShowModal] = useState(false);
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const onClickReply = (e) => {
 		e.preventDefault();
@@ -50,7 +53,7 @@ const SelectedTweet = () => {
 							</div>
 						</div>
 						<div className="tweet_body selected-tweet_body">
-							<p>{tweets.tweet.body}</p>
+							<p>{hashtagsFormatter(tweets.tweet.body, navigate, dispatch)}</p>
 							<div className="tweet_attachments selected-tweet_attachments">
 								{tweets.tweet.attachment && <img src={`/images/${tweets.tweet.attachment}`} />}
 							</div>

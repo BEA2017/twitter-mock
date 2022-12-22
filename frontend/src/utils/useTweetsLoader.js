@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { tweets_download, tweets_search, tweet_by_id } from '../store/tweetsSlice';
+import { refresh_feed, tweets_download, tweets_search, tweet_by_id } from '../store/tweetsSlice';
 import { getUsers, set_users_state } from '../store/userSlice';
 import useCache from './useCache';
 
@@ -21,6 +21,7 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 	const { cached } = useCache(user?.login, request.type, tweetId);
 	const [state, setState] = useState('NEVER');
 	const [mutex, setMutex] = useState(false);
+	const [prevSubs, setPrevSubs] = useState(undefined);
 
 	const dispatch = useDispatch();
 
@@ -39,8 +40,25 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 	};
 
 	useEffect(() => {
-		console.log('START');
-		startLoading();
+		if (request.type === 'FEED') {
+			if (!prevSubs) {
+				console.log('START:init');
+				setPrevSubs(user.subscriptions);
+				startLoading();
+			} else if (prevSubs.length !== user.subscriptions.length) {
+				console.log('START:refresh');
+				setPrevSubs(user.subscriptions);
+				dispatch(refresh_feed({ username: user.login }));
+				startLoading();
+			}
+		}
+	});
+
+	useEffect(() => {
+		if (request.type !== 'FEED') {
+			console.log('START:not FEED');
+			startLoading();
+		}
 	}, [request.searchType, request.type, user?.login, tweetId]);
 
 	//1. CHECK CACHE AND IF EMPTY SEND INITIAL TWEET REQUEST (RESULTS WILL BE CACHED)
@@ -50,6 +68,8 @@ const useTweetsLoader = ({ user, request, tweetId }) => {
 
 			setMutex(true);
 			dispatch(set_users_state('PENDING'));
+
+			console.log('checkCacheIsEmpty', checkCacheIsEmpty());
 
 			if (checkCacheIsEmpty()) {
 				request.type === 'TWEET'
